@@ -1,0 +1,163 @@
+# Fuentes y reglas de Ciber Radar. Para sumar una fuente, agregá un bloque [[feeds]].
+#
+# region:        ar | latam | mundo (si el título menciona Argentina, pasa a "ar")
+# require_cyber: true descarta las notas que no hablan de ciberseguridad
+# title_prefix:  solo acepta títulos con ese prefijo y lo quita
+# lang:          idioma de los títulos, si no es español
+# aggregator:    true marca un agregador. Las fuentes directas van antes para ganar los duplicados
+
+# --- Fuentes directas: Argentina y América Latina ---
+[[feeds]]
+name = "Segu-Info"
+url = "https://blog.segu-info.com.ar/feeds/posts/default"
+region = "latam"
+
+[[feeds]]
+name = "WeLiveSecurity (ESET)"
+url = "https://www.welivesecurity.com/es/rss/feed/"
+region = "latam"
+
+[[feeds]]
+name = "Segurilatam"
+url = "https://www.segurilatam.com/feed"
+region = "latam"
+require_cyber = true
+
+# --- Fuentes directas: España ---
+[[feeds]]
+name = "Escudo Digital"
+url = "https://www.escudodigital.com/rss/"
+region = "mundo"
+title_prefix = "ciberseguridad | "
+
+[[feeds]]
+name = "Una al Día (Hispasec)"
+url = "https://unaaldia.hispasec.com/feed"
+region = "mundo"
+
+[[feeds]]
+name = "INCIBE-CERT"
+url = "https://www.incibe.es/incibe-cert/alerta-temprana/avisos/feed"
+region = "mundo"
+
+# --- Fuentes directas: internacional ---
+[[feeds]]
+name = "CISA"
+lang = "en"
+url = "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+region = "mundo"
+
+[[feeds]]
+name = "BleepingComputer"
+lang = "en"
+url = "https://www.bleepingcomputer.com/feed/"
+region = "mundo"
+
+[[feeds]]
+name = "The Hacker News"
+lang = "en"
+url = "https://feeds.feedburner.com/TheHackersNews"
+region = "mundo"
+
+[[feeds]]
+name = "The Record"
+lang = "en"
+url = "https://therecord.media/feed/"
+region = "mundo"
+
+[[feeds]]
+name = "Krebs on Security"
+lang = "en"
+url = "https://krebsonsecurity.com/feed/"
+region = "mundo"
+
+[[feeds]]
+name = "Dark Reading"
+lang = "en"
+url = "https://www.darkreading.com/rss.xml"
+region = "mundo"
+
+[[feeds]]
+name = "SecurityWeek"
+lang = "en"
+url = "https://www.securityweek.com/feed/"
+region = "mundo"
+
+[[feeds]]
+name = "Infosecurity Magazine"
+lang = "en"
+url = "https://www.infosecurity-magazine.com/rss/news/"
+region = "mundo"
+
+# --- Google Noticias: medios generales (Clarín, Infobae, La Nación, TN, provinciales) ---
+[[feeds]]
+name = "Google Noticias: ciberseguridad Argentina"
+url = "https://news.google.com/rss/search?q=ciberseguridad+Argentina+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
+region = "mundo"
+aggregator = true
+require_cyber = true
+
+[[feeds]]
+name = "Google Noticias: incidentes Argentina"
+url = "https://news.google.com/rss/search?q=(ciberataque+OR+hackeo+OR+ransomware+OR+%22filtraci%C3%B3n+de+datos%22)+Argentina+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
+region = "mundo"
+aggregator = true
+require_cyber = true
+
+[[feeds]]
+name = "Google Noticias: papa y ciberseguridad"
+url = "https://news.google.com/rss/search?q=ciberseguridad+papa+Le%C3%B3n+XIV&hl=es-419&gl=AR&ceid=AR:es-419"
+region = "ar"
+aggregator = true
+require_cyber = true
+
+[[feeds]]
+name = "Google Noticias: ciberseguridad Latinoamérica"
+url = "https://news.google.com/rss/search?q=ciberseguridad+Latinoam%C3%A9rica+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
+region = "latam"
+aggregator = true
+require_cyber = true
+
+[limits]
+max_items_per_feed = 40   # por fuente y por corrida
+max_age_days = 30         # lo más viejo no entra
+notify_max_age_hours = 48 # lo más viejo no avisa
+latest_items = 400        # cuántas carga la app de entrada
+seen_retention_days = 180
+notify_per_run = 5        # el resto se resume en un solo aviso
+notify_per_day = 40
+
+# Un * es "cualquier final de palabra". No distinguen mayúsculas ni acentos.
+[rules]
+cyber = [
+  "ciber*", "cyber*", "hack*", "ransomware", "malware", "phishing", "smishing", "vishing",
+  "vulnerabilidad*", "filtracion*", "filtraron", "filtrado de datos", "brecha de datos",
+  "robo de datos", "datos personales", "deepfake*", "estafa* digital*", "estafas virtuales",
+  "seguridad informatica", "seguridad digital", "ddos", "zero-day", "dia cero", "suplantacion*",
+]
+argentina = [
+  "argentina", "argentinas", "argentino", "argentinos", "anses", "afip", "renaper", "bcra",
+  "mercado pago", "mercadopago", "buenos aires", "caba", "conicet", "cert.ar", "pami",
+  "banco nacion", "banco provincia", "provincia de cordoba", "rosario", "mendoza",
+]
+incident = [
+  "ciberataque*", "ataque informatico", "ataques informaticos", "hackeo*", "hackearon", "hackeado*",
+  "hacker*", "filtracion*", "filtraron", "brecha*", "robo de datos", "ransomware", "phishing",
+  "malware", "ciberestafa*", "estafa* digital*", "estafas virtuales", "deepfake*",
+  "ciberdelincuente*", "vulnerabilidad*", "suplantacion*", "ciberdefensa", "ciberpatrullaje",
+]
+critical = [
+  "zero-day", "zero day", "0-day", "dia cero", "actively exploited", "exploited in the wild",
+  "explotada activamente", "explotadas activamente", "explotacion activa",
+  "known exploited vulnerabilit*", "under active exploitation",
+]
+
+# El orden importa: gana la primera categoría que coincide.
+[categories]
+"Ransomware" = ["ransomware", "extorsion*"]
+"Filtraciones" = ["filtracion*", "filtraron", "filtrado de datos", "brecha*", "robo de datos", "data breach", "data leak", "breach*", "leak*"]
+"Estafas" = ["estafa*", "fraude*", "phishing", "smishing", "vishing", "scam*", "suplantacion*"]
+"Deepfakes e IA" = ["deepfake*", "inteligencia artificial", "ia generativa", "ai agent*", "llm"]
+"Vulnerabilidades" = ["vulnerabilidad*", "vulnerabilit*", "zero-day", "zero day", "dia cero", "cve-*", "parche*", "patch*", "exploit*", "advisory", "aviso de seguridad"]
+"Malware" = ["malware", "troyano*", "backdoor*", "botnet*", "spyware", "stealer*", "trojan*"]
+"Estado y defensa" = ["ciberdefensa", "ciberpatrullaje", "gobierno", "ministerio", "government", "nation-state", "espionaje", "cyberespionage", "ciberespionaje"]

@@ -1,0 +1,50 @@
+name: Nueva edición
+
+on:
+  schedule:
+    - cron: "11,41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: edition
+  cancel-in-progress: false
+
+jobs:
+  edition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Pruebas
+        run: python3 -m unittest discover -s tests
+
+      - name: Recolectar y avisar
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python3 collector/collect.py
+
+      - name: Generar el sitio
+        run: python3 collector/render.py
+
+      # Sin noticias nuevas no se gasta ningún despliegue. En el plan gratis Vercel solo
+      # despliega envíos del dueño de la cuenta, por eso se usa el Deploy Hook.
+      - name: Publicar si hay novedades
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if git diff --quiet -- state 'data/20*.json' && [ -z "$(git ls-files --others --exclude-standard data state)" ]; then
+            echo "Sin novedades"
+            exit 0
+          fi
+          git config user.name "ciber-radar-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data state public
+          git commit -m "edición: $(date -u +%FT%TZ)"
+          git push origin HEAD:main
+          curl --fail --silent --show-error --max-time 30 -X POST -o /dev/null "$DEPLOY_HOOK"

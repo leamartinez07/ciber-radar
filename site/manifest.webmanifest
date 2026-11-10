@@ -1,0 +1,24 @@
+{
+  "id": "/",
+  "name": "Ciber Radar",
+  "short_name": "Ciber Radar",
+  "description": "Las noticias de ciberseguridad de Argentina y el mundo, a medida que salen.",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbfaf6",
+  "theme_color": "#fbfaf6",
+  "categories": ["news", "security"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Argentina", "url": "/argentina" },
+    { "name": "Alertas", "url": "/alertas" }
+  ]
+}
