@@ -122,6 +122,13 @@ class RenderTests(unittest.TestCase):
         for url in urls:
             self.assertTrue((self.out / url.lstrip("/")).is_file(), url)
 
+    def test_deploy_ignore_is_anchored_to_the_root(self):
+        # Sin la barra inicial, "data" también excluye public/data y rompe búsqueda y offline.
+        rules = (ROOT / ".vercelignore").read_text(encoding="utf-8").split()
+        self.assertTrue(rules)
+        for rule in rules:
+            self.assertTrue(rule.startswith("/"), rule)
+
     def test_security_txt(self):
         text = (self.out / ".well-known/security.txt").read_text(encoding="utf-8")
         self.assertRegex(text, r"(?m)^Contact: https://github\.com/dueno/repo/")

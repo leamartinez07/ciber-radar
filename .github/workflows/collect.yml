@@ -38,13 +38,14 @@ jobs:
         env:
           DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
-          if git diff --quiet -- state 'data/20*.json' && [ -z "$(git ls-files --others --exclude-standard data state)" ]; then
+          # Una corrida manual siempre despliega: sirve para publicar cambios de código.
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] && git diff --quiet -- state 'data/20*.json' && [ -z "$(git ls-files --others --exclude-standard data state)" ]; then
             echo "Sin novedades"
             exit 0
           fi
           git config user.name "ciber-radar-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A data state public
-          git commit -m "edición: $(date -u +%FT%TZ)"
+          git diff --cached --quiet || git commit -m "edición: $(date -u +%FT%TZ)"
           git push origin HEAD:main
           curl --fail --silent --show-error --max-time 30 -X POST -o /dev/null "$DEPLOY_HOOK"
