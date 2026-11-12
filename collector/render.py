@@ -170,11 +170,9 @@ EMBLEM = (
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
-    '<defs><linearGradient id="lm-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#76cee2"/>'
-    '<stop offset=".5" stop-color="#ef86d3"/><stop offset="1" stop-color="#8f5cff"/></linearGradient></defs>'
-    '<rect class="lm-bg" x="1.5" y="1.5" width="61" height="61" rx="12"/>'
+    '<rect class="lm-bg" x="1.5" y="1.5" width="61" height="61" rx="2"/>'
     '<g transform="translate(-2.2 3) scale(.29)"><path class="lm-m" d="M40 30H70L118 92L166 30H196V146L172 170H168V78L126 130H110L68 78V142H40Z"/>'
-    '<path fill="url(#lm-beam)" d="M40 142H128V170H40Z"/></g></svg>'
+    '<path class="lm-bar" d="M40 142H128V170H40Z"/></g></svg>'
 )
 THEME_ICONS = (
     '<svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>'
@@ -247,9 +245,8 @@ class Lang:
     def time_tag(self, iso: str) -> str:
         return f'<time datetime="{esc(iso)}" data-rel>{esc(self.short_date(iso))}</time>'
 
-    def kicker(self, item: dict) -> str:
-        topic = self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
-        return f'{self.t["alert"]} · {topic}' if item["alert"] else topic
+    def topic(self, item: dict) -> str:
+        return self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
 
 
 def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story") -> str:
@@ -258,13 +255,14 @@ def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css
         return ""
     item_lang = item.get("lang", "es")
     attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
-    kicker = "kicker is-alert" if item["alert"] else "kicker"
+    # Tema y alerta van en la línea de datos, debajo del título: el titular no lleva etiqueta encima.
+    flag = f'<span class="flag">{esc(lang["alert"])}</span> ' if item["alert"] else ""
     body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
     return (
         f'<article class="{css}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
-        f'<p class="{kicker}">{esc(lang.kicker(item))}</p>'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
-        f'{body}<p class="meta">{esc(item["source"])} · {lang.time_tag(item["published"])}</p></article>'
+        f'{body}<p class="meta">{flag}<span class="subject">{esc(lang.topic(item))}</span> · {esc(item["source"])} · '
+        f'{lang.time_tag(item["published"])}</p></article>'
     )
 
 
@@ -406,7 +404,7 @@ def kev_table(lang: Lang, entries: list[dict], compact: bool = False) -> str:
             cells.append(cell(lang["th_flaw"], esc(e["name"]) + tag, foreign))
         cells.append(cell(lang["th_added"], added))
         if not compact:
-            cells.append(cell(lang["th_due"], esc(lang.date(e["due"])) if e["due"] else "—"))
+            cells.append(cell(lang["th_due"], f'<span class="date">{esc(lang.date(e["due"]))}</span>' if e["due"] else "—"))
         cells.append(cell(lang["th_epss"], epss_cell(lang, e)))
         rows.append(f'<tr role="row">{ROW_HEAD}{link}</th>{"".join(cells)}</tr>')
     heads = [lang["th_cve"], lang["th_product"]] + ([] if compact else [lang["th_flaw"]]) + [lang["th_added"]]
@@ -566,8 +564,8 @@ class Site:
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{esc(canonical)}">
 {hreflang if indexable else ""}
-<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0d0b12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
 <meta property="og:type" content="website">
@@ -586,8 +584,7 @@ class Site:
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>

@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 ICONS = SITE / "icons"
 
-BLACK, WHITE, GREY = "#0b0b0d", "#ffffff", "#a3a3aa"
+BLACK, WHITE, GREY = "#0a0a0a", "#ffffff", "#a3a3aa"
 RINGS, OPENING = (45.5, 30.0, 14.5), 36  # radios sobre una caja de 100 y media apertura en grados
 
 
@@ -46,17 +46,16 @@ def icon_svg(rounded: bool, scale: float = 1.0, small: bool = False) -> str:
 def og_html() -> str:
     fonts = (SITE / "fonts").resolve().as_uri()
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face {{ font-family: "Inter Tight"; src: url("{fonts}/inter-tight-latin-wght-normal.woff2"); font-weight: 100 900; }}
-@font-face {{ font-family: "Manrope"; src: url("{fonts}/manrope-latin-wght-normal.woff2"); font-weight: 200 800; }}
+@font-face {{ font-family: "Archivo"; src: url("{fonts}/archivo-latin-wdth-normal.woff2"); font-weight: 100 900; font-stretch: 62% 125%; }}
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
-body {{ display: grid; place-items: center; background: {BLACK}; color: {WHITE}; font-family: "Inter Tight"; }}
+body {{ display: grid; place-items: center; background: {BLACK}; color: {WHITE}; font-family: "Archivo"; }}
 .echo {{ position: absolute; inset: 0; width: 1200px; height: 630px; opacity: .09; }}
 .wrap {{ position: relative; display: flex; flex-direction: column; align-items: center; }}
-h1 {{ display: flex; align-items: baseline; margin: 0; font-weight: 800; font-size: 138px; line-height: 1; letter-spacing: -.02em; }}
+h1 {{ display: flex; align-items: baseline; margin: 0; font-weight: 850; font-stretch: 92%; font-size: 138px; line-height: 1; letter-spacing: -.015em; }}
 h1 svg {{ width: .727em; height: .727em; margin-right: .035em; }}
-h1 span {{ font-weight: 300; }}
-p {{ margin: 30px 0 0; font: 500 30px/1.2 "Manrope"; color: #d4d4d8; }}
-small {{ margin-top: 26px; font: 600 19px/1 "Manrope"; letter-spacing: .22em; color: {GREY}; }}
+h1 span {{ font-weight: 250; }}
+p {{ margin: 30px 0 0; font: 500 30px/1.2 "Archivo"; color: #ffffff; }}
+small {{ margin-top: 26px; font: 600 19px/1 "Archivo"; letter-spacing: .2em; color: {GREY}; }}
 </style></head><body>
 <svg class="echo" viewBox="0 0 1200 630"><g fill="none" stroke="{WHITE}" stroke-width="2">
 {"".join(f'<circle cx="600" cy="315" r="{r}"/>' for r in range(150, 760, 105))}</g></svg>
