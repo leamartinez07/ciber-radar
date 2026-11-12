@@ -161,13 +161,11 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
+# La C de la marca: tres anillos de radar abiertos hacia la señal detectada. Un solo color.
 EMBLEM = (
     '<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">'
-    '<defs><linearGradient id="cr-beam" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#76cee2"/>'
-    '<stop offset=".5" stop-color="#ef86d3"/><stop offset="1" stop-color="#8f5cff"/></linearGradient></defs>'
-    '<circle class="ring" cx="50" cy="50" r="44"/><circle class="ring" cx="50" cy="50" r="25"/>'
-    '<g class="sweep"><path class="wedge" d="M50 50 L50 6 A44 44 0 0 1 88.1 28 Z" fill="url(#cr-beam)"/></g>'
-    '<circle class="core" cx="50" cy="50" r="7"/><circle class="blip" cx="69" cy="68" r="6.5"/></svg>'
+    '<path d="M86.8 23.3A45.5 45.5 0 1 0 86.8 76.7"/><path d="M74.3 32.4A30.0 30.0 0 1 0 74.3 67.6"/>'
+    '<path d="M61.7 41.5A14.5 14.5 0 1 0 61.7 58.5"/><circle class="blip" cx="86" cy="50" r="7"/></svg>'
 )
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
@@ -544,7 +542,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">Ciber {EMBLEM} Radar</a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="sr">C</span><span class="thin">iber</span>Radar</a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}
