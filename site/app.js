@@ -267,3 +267,8 @@ function start() {
 }
 
 start();
+
+const brandNode = document.querySelector(".brand");
+if (brandNode && "IntersectionObserver" in window) {
+  new IntersectionObserver(([entry]) => brandNode.classList.toggle("is-idle", !entry.isIntersecting)).observe(brandNode);
+}

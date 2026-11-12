@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es la palabra CIBERRADAR en una sola pieza: la C son tres anillos de radar abiertos hacia el punto de la señal detectada. Es de un solo color; la versión principal es blanca sobre negro y en el tema claro pasa a tinta. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es la palabra CIBERADAR en una sola pieza: la R une las dos palabras, su panza es la pantalla del radar y su pata son las ondas que emite. Es de un solo color; la versión principal es blanca sobre negro y en el tema claro pasa a tinta. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## Cambiar qué avisa
 

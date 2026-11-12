@@ -161,11 +161,14 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
-# La C de la marca: tres anillos de radar abiertos hacia la señal detectada. Un solo color.
+# La R que une CIBE y ADAR: la panza es la pantalla del radar (hueco, punto y barrido) y la pata
+# son las ondas que emite. Un solo color. tools/make_brand.py dibuja la misma letra.
 EMBLEM = (
-    '<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">'
-    '<path d="M86.8 23.3A45.5 45.5 0 1 0 86.8 76.7"/><path d="M74.3 32.4A30.0 30.0 0 1 0 74.3 67.6"/>'
-    '<path d="M61.7 41.5A14.5 14.5 0 1 0 61.7 58.5"/><circle class="blip" cx="86" cy="50" r="7"/></svg>'
+    '<svg class="emblem" viewBox="0 0 102 100" aria-hidden="true" focusable="false">'
+    '<clipPath id="cr-leg"><rect x="30" y="0" width="72" height="100"/></clipPath>'
+    '<path fill-rule="evenodd" d="M0 0H55A31 31 0 0 1 55 62H22V100H0ZM35 31A20 20 0 1 0 75 31A20 20 0 1 0 35 31Z"/>'
+    '<path class="sweep" d="M55 31L55 11A20 20 0 0 1 75 31Z"/><circle cx="55" cy="31" r="6"/>'
+    '<g class="waves" clip-path="url(#cr-leg)"><path d="M85.9 60.9A43 43 0 0 1 50.5 73.8"/><path d="M97.4 72.0A59 59 0 0 1 48.8 89.7"/><path d="M109.0 83.1A75 75 0 0 1 47.2 105.6"/></g></svg>'
 )
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
@@ -540,7 +543,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="sr">C</span><span class="thin">iber</span>Radar</a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}"><span class="thin">Cibe</span>{EMBLEM}<span class="sr">r</span>adar</a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}

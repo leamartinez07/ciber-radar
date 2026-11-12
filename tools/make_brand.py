@@ -1,8 +1,8 @@
 """Genera la marca de Ciber Radar desde un solo dibujo: íconos de la app, favicon e imagen para redes.
 
-El emblema es la C de la marca hecha con tres anillos de radar, abiertos hacia el punto que marca
-la señal detectada. Es de un solo color: blanco sobre negro en la versión principal. Es el mismo
-dibujo que abre la palabra CIBERRADAR en la cabecera del sitio.
+El emblema es la R que une CIBE y ADAR: la panza es la pantalla del radar (hueco, punto y barrido)
+y la pata son las ondas que emite. Es de un solo color: blanco sobre negro en la versión principal.
+Es la misma letra que aparece en la cabecera del sitio.
 
 Herramienta de desarrollo: usa Playwright con Chromium para pasar el SVG a PNG.
     PLAYWRIGHT_BROWSERS_PATH=… python tools/make_brand.py
@@ -20,25 +20,33 @@ SITE = ROOT / "site"
 ICONS = SITE / "icons"
 
 BLACK, WHITE, GREY = "#0a0a0a", "#ffffff", "#a3a3aa"
-RINGS, OPENING = (45.5, 30.0, 14.5), 36  # radios sobre una caja de 100 y media apertura en grados
+CX, CY, OUTER, HOLE, WIDTH = 55, 31, 31, 20, 102  # la R en una caja de 102 × 100
+BODY = "M0 0H55A31 31 0 0 1 55 62H22V100H0ZM35 31A20 20 0 1 0 75 31A20 20 0 1 0 35 31Z"
+SWEEP = "M55 31L55 11A20 20 0 0 1 75 31Z"
 
 
-def radar(size: float, cx: float, cy: float, color: str = WHITE, rings: tuple[float, ...] = RINGS,
-          stroke: float = 9.0) -> str:
-    """El emblema dibujado en un cuadrado de lado size con centro en (cx, cy)."""
-    k = size / 100
-    dx, dy = math.cos(math.radians(OPENING)), math.sin(math.radians(OPENING))
-    arcs = "".join(
-        f'<path d="M{cx + r * k * dx:.1f} {cy - r * k * dy:.1f}A{r * k:.1f} {r * k:.1f} 0 1 0 '
-        f'{cx + r * k * dx:.1f} {cy + r * k * dy:.1f}"/>' for r in rings)
-    return (f'<g fill="none" stroke="{color}" stroke-width="{stroke * k:.1f}">{arcs}</g>'
-            f'<circle cx="{cx + 36 * k:.1f}" cy="{cy:.1f}" r="{7 * k:.1f}" fill="{color}"/>')
+def wave(radius: float) -> str:
+    pt = lambda a: (CX + radius * math.cos(math.radians(a)), CY + radius * math.sin(math.radians(a)))
+    (x0, y0), (x1, y1) = pt(44), pt(96)
+    return f"M{x0:.1f} {y0:.1f}A{radius} {radius} 0 0 1 {x1:.1f} {y1:.1f}"
+
+
+def radar(height: float, cx: float, cy: float, color: str = WHITE, waves: tuple[float, ...] = (43, 59, 75),
+          stroke: float = 12.0, sweep: bool = True) -> str:
+    """La R de la marca, de alto height y centrada en (cx, cy)."""
+    width = height * WIDTH / 100
+    beam = f'<path d="{SWEEP}" fill="{color}" opacity=".5"/>' if sweep else ""
+    return (f'<svg x="{cx - width / 2:.1f}" y="{cy - height / 2:.1f}" width="{width:.1f}" height="{height:.1f}" '
+            f'viewBox="0 0 {WIDTH} 100"><clipPath id="leg"><rect x="30" y="0" width="{WIDTH - 30}" height="100"/></clipPath>'
+            f'<path fill-rule="evenodd" fill="{color}" d="{BODY}"/>{beam}<circle cx="{CX}" cy="{CY}" r="6" fill="{color}"/>'
+            f'<g clip-path="url(#leg)" fill="none" stroke="{color}" stroke-width="{stroke}">'
+            f'{"".join(f'<path d="{wave(r)}"/>' for r in waves)}</g></svg>')
 
 
 def icon_svg(rounded: bool, scale: float = 1.0, small: bool = False) -> str:
     corner = ' rx="112"' if rounded else ""
-    # En 32 px tres anillos se empastan: el favicon lleva dos, más gruesos.
-    mark = radar(400, 256, 256, rings=(43.0, 20.0), stroke=14.0) if small else radar(330 * scale, 256, 256)
+    # En 32 px tres ondas se empastan: el favicon lleva dos, más gruesas, y sin barrido.
+    mark = radar(380, 256, 256, waves=(45, 66), stroke=17.0, sweep=False) if small else radar(300 * scale, 256, 256)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
             f'<rect width="512" height="512"{corner} fill="{BLACK}"/>{mark}</svg>')
 
@@ -52,14 +60,14 @@ body {{ display: grid; place-items: center; background: {BLACK}; color: {WHITE};
 .echo {{ position: absolute; inset: 0; width: 1200px; height: 630px; opacity: .09; }}
 .wrap {{ position: relative; display: flex; flex-direction: column; align-items: center; }}
 h1 {{ display: flex; align-items: baseline; margin: 0; font-weight: 850; font-stretch: 92%; font-size: 138px; line-height: 1; letter-spacing: -.015em; }}
-h1 svg {{ width: .727em; height: .727em; margin-right: .035em; }}
+h1 svg {{ width: auto; height: .692em; margin: 0 .03em 0 .05em; }}
 h1 span {{ font-weight: 250; }}
 p {{ margin: 30px 0 0; font: 500 30px/1.2 "Archivo"; color: #ffffff; }}
 small {{ margin-top: 26px; font: 600 19px/1 "Archivo"; letter-spacing: .2em; color: {GREY}; }}
 </style></head><body>
 <svg class="echo" viewBox="0 0 1200 630"><g fill="none" stroke="{WHITE}" stroke-width="2">
 {"".join(f'<circle cx="600" cy="315" r="{r}"/>' for r in range(150, 760, 105))}</g></svg>
-<div class="wrap"><h1><svg viewBox="0 0 100 100">{radar(100, 50, 50)}</svg><span>IBER</span>RADAR</h1>
+<div class="wrap"><h1><span>CIBE</span><svg viewBox="0 0 {WIDTH} 100">{radar(100, WIDTH / 2, 50)}</svg>ADAR</h1>
 <p>Toda la ciberseguridad, a medida que sale.</p>
 <small>ARGENTINA · LATAM · WORLD</small></div></body></html>'''
 
