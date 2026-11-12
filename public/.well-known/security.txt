@@ -1,4 +1,4 @@
-Contact: https://github.com/leamartinez07/ciber-radar/security/advisories/new
-Expires: 2027-10-06T07:28:01Z
+Contact: mailto:leaamartinez7@gmail.com
+Expires: 2027-10-08T00:07:34Z
 Preferred-Languages: es, en
 Canonical: https://ciber-radar.vercel.app/.well-known/security.txt

@@ -151,7 +151,7 @@ def parse_feed(data: bytes) -> list[dict]:
     for node in root.iter():
         if _local(node.tag) not in ("item", "entry"):
             continue
-        entry: dict = {"link": "", "date": "", "summary": "", "title": "", "source": "", "guid": ""}
+        entry: dict = {"link": "", "date": "", "summary": "", "title": "", "source": "", "source_url": "", "guid": ""}
         for child in node:
             name = _local(child.tag)
             text = (child.text or "").strip()
@@ -171,6 +171,7 @@ def parse_feed(data: bytes) -> list[dict]:
                 entry["summary"] = entry["summary"] or text
             elif name == "source" and text:
                 entry["source"] = text
+                entry["source_url"] = child.get("url", "")
             elif name in ("guid", "id"):
                 entry["guid"] = text
         entry["date"] = entry["date"] or entry.get("updated", "")
@@ -188,6 +189,13 @@ class Rules:
         self.incident = compile_terms(rules["incident"])
         self.critical = compile_terms(rules["critical"])
         self.categories = [(name, compile_terms(terms)) for name, terms in config["categories"].items()]
+        self.trusted = {d.lower().removeprefix("www.") for d in config.get("trusted", {}).get("outlets", [])}
+
+    def is_trusted(self, url: str) -> bool:
+        """Un agregador solo aporta notas de medios de la lista; un subdominio cuenta como su medio."""
+        host = urllib.parse.urlsplit(safe_url(url)).hostname or ""
+        host = host.lower().removeprefix("www.")
+        return any(host == d or host.endswith("." + d) for d in self.trusted)
 
     def category(self, text: str) -> str:
         for name, pattern in self.categories:
@@ -208,6 +216,9 @@ def build_item(feed: dict, entry: dict, now: dt.datetime, rules: Rules) -> dict 
         if not title.casefold().startswith(prefix.casefold()):
             return None
         title = title[len(prefix):].strip()
+
+    if feed.get("aggregator") and not rules.is_trusted(entry.get("source_url", "")):
+        return None
 
     source = clean_text(entry["source"]) or feed["name"]
     suffix = f" - {source}"
@@ -244,12 +255,15 @@ def build_item(feed: dict, entry: dict, now: dt.datetime, rules: Rules) -> dict 
     }
 
 
-def fetch_url(url: str, timeout: float = 25) -> bytes:
+FEED_ACCEPT = "application/rss+xml, application/atom+xml, text/xml, */*"
+
+
+def fetch_url(url: str, timeout: float = 25, accept: str = FEED_ACCEPT) -> bytes:
     if not url.startswith("https://"):
         raise ValueError("solo se aceptan feeds https")
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/rss+xml, application/atom+xml, text/xml, */*"},
+        headers={"User-Agent": USER_AGENT, "Accept": accept},
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         data = response.read(MAX_FEED_BYTES + 1)

@@ -46,7 +46,18 @@ class RenderTests(unittest.TestCase):
             "items": items,
         }
         (data / "latest.json").write_text(json.dumps(latest), encoding="utf-8")
-        render.Site(data, ROOT / "site", cls.out, "https://radar.test", "dueno/repo").build()
+        vulns = {
+            "generated": "2026-11-10T11:00:00+00:00", "kev_total": 1500,
+            "kev": [{"cve": "CVE-2026-1111", "vendor": ATTACK, "product": "Router", "name": ATTACK, "description": ATTACK,
+                     "added": "2026-11-09", "due": "2026-11-30", "ransomware": True,
+                     "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1111", "epss": 0.42, "percentile": 0.98}],
+            "critical": [{"cve": "CVE-2026-3333", "score": 9.8, "cvss": "3.1", "description": ATTACK,
+                          "published": "2026-11-10T01:00:00+00:00", "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3333",
+                          "epss": None, "percentile": None}],
+            "sources": [{"name": "CISA KEV", "ok": True, "error": ""}],
+        }
+        (data / "vulns.json").write_text(json.dumps(vulns), encoding="utf-8")
+        render.Site(data, ROOT / "site", cls.out, "https://radar.test").build()
         cls.home = (cls.out / "index.html").read_text(encoding="utf-8")
 
     @classmethod
@@ -57,7 +68,9 @@ class RenderTests(unittest.TestCase):
         return list(self.out.rglob("*.html"))
 
     def test_expected_pages_exist(self):
-        for name in ("index", "argentina", "latinoamerica", "mundo", "alertas", "archivo", "archivo/2026-11", "404"):
+        for name in ("index", "argentina", "latinoamerica", "mundo", "alertas", "vulnerabilidades", "archivo",
+                     "archivo/2026-11", "404", "en", "en/argentina", "en/latin-america", "en/world", "en/alerts",
+                     "en/vulnerabilities", "en/archive", "en/archive/2026-11"):
             self.assertTrue((self.out / f"{name}.html").is_file(), name)
 
     def test_feed_text_is_escaped_everywhere(self):
@@ -87,7 +100,7 @@ class RenderTests(unittest.TestCase):
 
     def test_assets_are_fingerprinted_and_exist(self):
         names = re.findall(r'(?:href|src)="(/assets/[^"]+)"', self.home)
-        self.assertEqual(len(names), 2)
+        self.assertEqual(len(names), 3)
         for name in names:
             self.assertRegex(name, r"\.[0-9a-f]{12}\.(css|js)$")
             self.assertTrue((self.out / name.lstrip("/")).is_file())
@@ -100,6 +113,9 @@ class RenderTests(unittest.TestCase):
 
     def test_foreign_titles_are_marked(self):
         self.assertIn('<h3 lang="en">', (self.out / "argentina.html").read_text(encoding="utf-8"))
+        english = (self.out / "en/argentina.html").read_text(encoding="utf-8")
+        self.assertNotIn('<h3 lang="en">', english)
+        self.assertIn('<h3 lang="es">', english)
 
     def test_xml_files_parse(self):
         for name in ("feed.xml", "sitemap.xml"):
@@ -129,9 +145,70 @@ class RenderTests(unittest.TestCase):
         for rule in rules:
             self.assertTrue(rule.startswith("/"), rule)
 
+    def test_footer_credits_the_owner(self):
+        for path in self.pages():
+            page = path.read_text(encoding="utf-8")
+            self.assertIn(f"© 2026", page, path)
+            self.assertIn(render.OWNER, page, path)
+            self.assertIn(f'href="mailto:{render.OWNER_EMAIL}"', page, path)
+            self.assertIn(f'href="{render.OWNER_URL}"', page, path)
+
+    def test_theme_script_runs_before_paint(self):
+        head = self.home.split("</head>")[0]
+        theme = re.search(r'<script src="(/assets/theme\.[0-9a-f]{12}\.js)"></script>', head)
+        self.assertIsNotNone(theme)
+        self.assertLess(head.index(theme.group(0)), head.index('rel="stylesheet"'))
+
+    def test_nav_marks_only_the_current_section(self):
+        for name, label in (("index", "Portada"), ("argentina", "Argentina"), ("archivo", None), ("404", None)):
+            page = (self.out / f"{name}.html").read_text(encoding="utf-8")
+            current = re.findall(r'aria-current="page">([^<]+)<', page)
+            self.assertEqual(current, [label] if label else [], name)
+
+    def test_languages_link_to_each_other(self):
+        for name, lang, twin in (("argentina", "es-AR", "/en/argentina"), ("en/world", "en", "/mundo"),
+                                 ("archivo/2026-11", "es-AR", "/en/archive/2026-11"), ("en", "en", "https://radar.test/")):
+            page = (self.out / f"{name}.html").read_text(encoding="utf-8")
+            self.assertIn(f'<html lang="{lang}">', page, name)
+            self.assertIn('hreflang="x-default"', page, name)
+            self.assertIn(twin, page, name)
+
+    def test_english_interface(self):
+        page = (self.out / "en.html").read_text(encoding="utf-8")
+        self.assertIn("Vulnerability radar", page)
+        self.assertIn("All rights reserved.", page)
+        self.assertNotIn("Portada", page)
+
+    def test_vulnerability_page(self):
+        page = (self.out / "vulnerabilidades.html").read_text(encoding="utf-8")
+        self.assertIn("CVE-2026-1111", page)
+        self.assertIn("CVE-2026-3333", page)
+        self.assertIn("42.0", page)
+        self.assertIn("no lo respalda", page)
+        self.assertIn("Vulnerabilidades", (self.out / "index.html").read_text(encoding="utf-8"))
+
+    def test_brand_assets_exist(self):
+        for name in ("favicon.ico", "og.png", "icons/icon.svg", "icons/apple-touch-icon.png", "icons/icon-maskable-512.png"):
+            self.assertTrue((self.out / name).is_file(), name)
+        manifest = json.loads((self.out / "manifest.webmanifest").read_text(encoding="utf-8"))
+        for icon in manifest["icons"]:
+            self.assertTrue((self.out / icon["src"].lstrip("/")).is_file(), icon["src"])
+        self.assertIn("maskable", {i["purpose"] for i in manifest["icons"]})
+
+    def test_internal_links_resolve(self):
+        missing = set()
+        for path in self.pages():
+            for href in re.findall(r'href="(/[^"#]*)"', path.read_text(encoding="utf-8")):
+                target = self.out / href.lstrip("/")
+                if href == "/" or target.is_file() or target.with_suffix(target.suffix + ".html").is_file() \
+                        or (self.out / (href.lstrip("/") + ".html")).is_file():
+                    continue
+                missing.add(href)
+        self.assertEqual(missing, set())
+
     def test_security_txt(self):
         text = (self.out / ".well-known/security.txt").read_text(encoding="utf-8")
-        self.assertRegex(text, r"(?m)^Contact: https://github\.com/dueno/repo/")
+        self.assertRegex(text, r"(?m)^Contact: mailto:\S+@\S+$")
         self.assertRegex(text, r"(?m)^Expires: \d{4}-")
 
 

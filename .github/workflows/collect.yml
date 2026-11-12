@@ -29,6 +29,12 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python3 collector/collect.py
 
+      - name: Vulnerabilidades (CISA KEV, EPSS, NVD)
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        # Si fallan todas sus fuentes, el sitio se publica igual con los datos anteriores.
+        run: python3 collector/vulns.py || echo "::warning::vulnerabilidades sin actualizar"
+
       - name: Generar el sitio
         run: python3 collector/render.py
 
@@ -39,7 +45,7 @@ jobs:
           DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
           # Una corrida manual siempre despliega: sirve para publicar cambios de código.
-          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] && git diff --quiet -- state 'data/20*.json' && [ -z "$(git ls-files --others --exclude-standard data state)" ]; then
+          if [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ] && git diff --quiet -- state 'data/20*.json' data/vulns.json && [ -z "$(git ls-files --others --exclude-standard data state)" ]; then
             echo "Sin novedades"
             exit 0
           fi

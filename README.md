@@ -3,7 +3,8 @@
 Diario de ciberseguridad que se actualiza solo y avisa al celular.
 
 - `collector/collect.py` lee las fuentes de `feeds.toml`, deduplica, clasifica y manda avisos.
-- `collector/render.py` genera en `public/` un sitio estático completo: portada, secciones, archivo, RSS, sitemap y `security.txt`.
+- `collector/vulns.py` trae las vulnerabilidades explotadas (CISA KEV), los CVE críticos nuevos (NVD) y la probabilidad de explotación (FIRST EPSS). Las tres APIs son gratis y sin clave. Avisa cada alta nueva en KEV.
+- `collector/render.py` genera en `public/` un sitio estático completo en español (`/`) y en inglés (`/en`): portada, secciones, vulnerabilidades, archivo, RSS, sitemap con hreflang y `security.txt`.
 - `.github/workflows/collect.yml` corre ambos cada 30 minutos y publica solo si hay noticias nuevas. Cada edición dispara un Deploy Hook de Vercel: como máximo 48 despliegues por día, dentro de los 100 del plan gratis.
 
 Solo usa la biblioteca estándar de Python.
@@ -13,11 +14,20 @@ Solo usa la biblioteca estándar de Python.
 ```bash
 python3 -m unittest discover -s tests
 python3 collector/collect.py
+python3 collector/vulns.py
 python3 collector/render.py
 python3 tools/serve.py 8000
 ```
 
 `tools/serve.py` sirve `public/` como Vercel, con las cabeceras de `vercel.json`.
+
+## Fuentes confiables
+
+Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CERT, NCSC) e investigación primaria (Talos, Unit 42, Project Zero). De Google Noticias solo entran notas de los medios de `[trusted]` en `feeds.toml`: diarios con redacción propia, agencias y prensa tecnológica reconocida. Para sumar un medio, agregá su dominio a esa lista.
+
+## Marca
+
+`tools/make_brand.py` genera desde un mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## Cambiar qué avisa
 
@@ -31,4 +41,8 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Playfair Display, Source Serif 4 y JetBrains Mono, con licencia SIL Open Font License 1.1. Las licencias están en `site/fonts/`.
+Inter Tight (titulares), Manrope (interfaz, la misma del portfolio), Source Serif 4 (resúmenes) y JetBrains Mono (solo datos de la barra de alerta), con licencia SIL Open Font License 1.1. Las licencias están en `site/fonts/`.
+
+## Diseño
+
+Tema claro, oscuro y automático con el botón de la barra superior; `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA (el texto principal, AAA). El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.

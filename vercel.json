@@ -92,5 +92,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/en",
+      "destination": "/en.html"
+    }
   ]
 }

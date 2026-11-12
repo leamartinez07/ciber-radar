@@ -99,9 +99,23 @@ class ItemTests(unittest.TestCase):
 
     def test_google_suffix_removed_and_source_used(self):
         feed = {"name": "G", "region": "ar", "aggregator": True}
-        item = self.item("Nueva estafa digital en bancos - Infobae", feed, source="Infobae")
+        item = self.item("Nueva estafa digital en bancos - Infobae", feed, source="Infobae", source_url="https://www.infobae.com")
         self.assertEqual(item["title"], "Nueva estafa digital en bancos")
         self.assertEqual(item["source"], "Infobae")
+
+    def test_aggregator_keeps_only_trusted_outlets(self):
+        feed = {"name": "G", "region": "ar", "aggregator": True, "require_cyber": True}
+        title = "Hackeo a un banco expone datos de clientes"
+        self.assertIsNone(self.item(title, feed, source="Sitio X", source_url="https://sitio-desconocido.test"))
+        self.assertIsNone(self.item(title, feed, source="Sin URL"))
+        self.assertIsNone(self.item(title, feed, source="Falso", source_url="https://clarin.com.falso.test"))
+        self.assertIsNotNone(self.item(title, feed, source="Clarín", source_url="https://www.clarin.com"))
+        self.assertIsNotNone(self.item(title, feed, source="LN", source_url="https://www.lanacion.com.ar"))
+
+    def test_source_url_is_parsed(self):
+        data = (b'<?xml version="1.0"?><rss><channel><item><title>T</title><link>https://n.test/1</link>'
+                b'<source url="https://www.infobae.com">Infobae</source></item></channel></rss>')
+        self.assertEqual(collect.parse_feed(data)[0]["source_url"], "https://www.infobae.com")
 
     def test_title_prefix_filter(self):
         feed = {"name": "E", "region": "mundo", "title_prefix": "ciberseguridad | "}

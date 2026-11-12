@@ -4,7 +4,8 @@
 # require_cyber: true descarta las notas que no hablan de ciberseguridad
 # title_prefix:  solo acepta títulos con ese prefijo y lo quita
 # lang:          idioma de los títulos, si no es español
-# aggregator:    true marca un agregador. Las fuentes directas van antes para ganar los duplicados
+# aggregator:    true marca un agregador. Las fuentes directas van antes para ganar los duplicados.
+#                De un agregador solo entran notas de los medios de [trusted].
 
 # --- Fuentes directas: Argentina y América Latina ---
 [[feeds]]
@@ -89,6 +90,31 @@ lang = "en"
 url = "https://www.infosecurity-magazine.com/rss/news/"
 region = "mundo"
 
+# --- Fuentes oficiales e investigación primaria ---
+[[feeds]]
+name = "NCSC (Reino Unido)"
+lang = "en"
+url = "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml"
+region = "mundo"
+
+[[feeds]]
+name = "Cisco Talos"
+lang = "en"
+url = "https://blog.talosintelligence.com/rss/"
+region = "mundo"
+
+[[feeds]]
+name = "Unit 42 (Palo Alto Networks)"
+lang = "en"
+url = "https://unit42.paloaltonetworks.com/feed/"
+region = "mundo"
+
+[[feeds]]
+name = "Google Project Zero"
+lang = "en"
+url = "https://googleprojectzero.blogspot.com/feeds/posts/default"
+region = "mundo"
+
 # --- Google Noticias: medios generales (Clarín, Infobae, La Nación, TN, provinciales) ---
 [[feeds]]
 name = "Google Noticias: ciberseguridad Argentina"
@@ -105,18 +131,37 @@ aggregator = true
 require_cyber = true
 
 [[feeds]]
-name = "Google Noticias: papa y ciberseguridad"
-url = "https://news.google.com/rss/search?q=ciberseguridad+papa+Le%C3%B3n+XIV&hl=es-419&gl=AR&ceid=AR:es-419"
-region = "ar"
-aggregator = true
-require_cyber = true
-
-[[feeds]]
 name = "Google Noticias: ciberseguridad Latinoamérica"
 url = "https://news.google.com/rss/search?q=ciberseguridad+Latinoam%C3%A9rica+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
 region = "latam"
 aggregator = true
 require_cyber = true
+
+# Medios aceptados desde Google Noticias: diarios nacionales y regionales con redacción propia,
+# agencias y prensa tecnológica reconocida. Un dominio cubre sus subdominios.
+# Se revisa a mano; no entran sitios de cripto, de clics ni portales sin autoría.
+[trusted]
+outlets = [
+  # Argentina
+  "clarin.com", "lanacion.com.ar", "infobae.com", "tn.com.ar", "pagina12.com.ar", "perfil.com",
+  "ambito.com", "cronista.com", "iprofesional.com", "iproup.com", "eldiarioar.com", "chequeado.com",
+  "forbesargentina.com", "infotechnology.com", "cadena3.com", "lavoz.com.ar", "losandes.com.ar",
+  "lagaceta.com.ar", "lacapital.com.ar", "mdzol.com", "lanueva.com", "eldia.com", "rionegro.com.ar",
+  "eltribuno.com", "eldestapeweb.com", "c5n.com", "a24.com", "telesemana.com", "itsitio.com",
+  "dplnews.com", "bnamericas.com", "argentina.gob.ar",
+  # América Latina
+  "eltiempo.com", "semana.com", "elespectador.com", "portafolio.co", "larepublica.co",
+  "elcomercio.pe", "larepublica.pe", "andina.pe", "latercera.com", "emol.com", "biobiochile.cl",
+  "df.cl", "eluniversal.com.mx", "milenio.com", "expansion.mx", "elfinanciero.com.mx",
+  "eleconomista.com.mx", "jornada.com.mx", "nmas.com.mx", "elobservador.com.uy", "elpais.com.uy",
+  "montevideo.com.uy", "abc.com.py", "ultimahora.com", "eluniverso.com", "primicias.ec",
+  "elcomercio.com", "prensa.com", "eldeber.com.bo", "nacion.com", "listindiario.com",
+  "bloomberglinea.com",
+  # Internacional en español y agencias
+  "elpais.com", "elmundo.es", "20minutos.es", "europapress.es", "efe.com", "bbc.com", "dw.com",
+  "france24.com", "cnn.com", "reuters.com", "apnews.com", "xataka.com", "hipertextual.com",
+  "welivesecurity.com", "redseguridad.com", "ituser.es",
+]
 
 [limits]
 max_items_per_feed = 40   # por fuente y por corrida
