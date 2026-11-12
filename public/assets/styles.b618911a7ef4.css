@@ -86,7 +86,8 @@ button, input, select { font: inherit; color: inherit; }
 a, button, input, select, summary { touch-action: manipulation; }
 ::selection { background: var(--accent); color: var(--surface); }
 input { caret-color: var(--accent); }
-h1, h2, h3 { text-wrap: balance; }
+h1, h2 { text-wrap: balance; }
+h3 { text-wrap: pretty; }
 p { text-wrap: pretty; }
 time, .meta, .wire-meta, .pulse-chart figcaption { font-variant-numeric: tabular-nums; }
 svg { flex: none; }
@@ -341,6 +342,7 @@ svg { flex: none; }
 .strip-sub { margin: 10px 0 4px; font: italic 1rem/1.5 var(--serif); color: var(--ink-2); }
 .vuln-stats { margin: 16px 0 0; font-size: .9375rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .vuln-block { margin-top: 8px; }
+.vuln-stats + .tools { margin-top: 20px; max-width: 520px; }
 .vuln-sources { margin: 28px 0 0; font-size: .8125rem; color: var(--muted); }
 .table-wrap { margin-top: 8px; }
 .vuln-table { width: 100%; border-collapse: collapse; font-size: .9375rem; font-variant-numeric: tabular-nums; }

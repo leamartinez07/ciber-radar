@@ -169,8 +169,29 @@ function bindSearch() {
   document.querySelector(".tools").addEventListener("submit", (event) => event.preventDefault());
 }
 
+// Filtro de la página de vulnerabilidades: oculta las filas que no coinciden.
+function bindVulnFilter() {
+  const input = $("vuln-filter");
+  if (!input) return;
+  const rows = [...document.querySelectorAll(".vuln-table tbody tr")].map((row) => [row, normalize(row.textContent)]);
+  input.addEventListener("input", () => {
+    const words = normalize(input.value.trim()).split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const [row, text] of rows) {
+      row.hidden = !words.every((word) => text.includes(word));
+      if (!row.hidden) shown += 1;
+    }
+    document.querySelectorAll(".vuln-block").forEach((block) => {
+      block.hidden = !block.querySelector("tbody tr:not([hidden])");
+    });
+    $("vuln-empty").hidden = shown > 0;
+  });
+  input.form.addEventListener("submit", (event) => event.preventDefault());
+}
+
 function bind() {
   bindSearch();
+  bindVulnFilter();
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible") return;
     const searching = $("query")?.value || $("category")?.value;

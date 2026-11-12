@@ -85,6 +85,8 @@ LANGS = {
         "vuln_stats": "{kev} altas en KEV en 30 días · {nvd} CVE críticos en 72 h · {total} fallos en el catálogo KEV",
         "vuln_sources": "Fuentes: CISA KEV (CC0 1.0), FIRST EPSS y NVD de NIST.",
         "no_vulns": "No hay datos de vulnerabilidades por ahora.",
+        "vuln_filter": "Filtrar vulnerabilidades", "vuln_filter_ph": "Filtrar por CVE, fabricante o producto…",
+        "vuln_none": "Ninguna vulnerabilidad coincide con el filtro.",
         "sec": {
             "ar": ("argentina", "Argentina", "Ciberataques, filtraciones de datos, estafas digitales y ciberdefensa en Argentina, actualizado cada 30 minutos."),
             "latam": ("latinoamerica", "Latinoamérica", "Noticias de ciberseguridad de América Latina: amenazas, incidentes y análisis regionales."),
@@ -144,6 +146,8 @@ LANGS = {
         "vuln_stats": "{kev} KEV additions in 30 days · {nvd} critical CVEs in 72 h · {total} flaws in the KEV catalog",
         "vuln_sources": "Sources: CISA KEV (CC0 1.0), FIRST EPSS and NIST's NVD.",
         "no_vulns": "No vulnerability data right now.",
+        "vuln_filter": "Filter vulnerabilities", "vuln_filter_ph": "Filter by CVE, vendor or product…",
+        "vuln_none": "No vulnerability matches the filter.",
         "sec": {
             "ar": ("argentina", "Argentina", "Cyberattacks, data breaches, online scams and cyber defense in Argentina, updated every 30 minutes."),
             "latam": ("latin-america", "Latin America", "Cybersecurity news from Latin America: threats, incidents and regional analysis."),
@@ -313,7 +317,7 @@ def pick_front(items: list[dict], now: dt.datetime) -> dict:
             chosen.append(words)
         return picked
 
-    subleads = take(pool, lambda i: i["summary"], 4)
+    subleads = take(pool, lambda i: i["summary"], 6)  # seis llenan la columna central a la altura de las laterales
     argentina = take(items, lambda i: i["region"] == "ar", 7)
     alerts = take(items, lambda i: i["alert"], 7)
     alerts += take(pool, lambda i: i["category"] in CRITICAL_TOPICS, 7 - len(alerts))
@@ -366,39 +370,65 @@ def epss_cell(lang: Lang, entry: dict) -> str:
     return f'<span class="{css}" title="{esc(lang["epss_hint"])}">{value * 100:.1f} %</span>'
 
 
+def product_name(entry: dict) -> str:
+    """«PHP Group» + «PHP» o «WordPress» + «WordPress Core» se leen mejor sin repetir el fabricante."""
+    vendor, product = entry["vendor"].strip(), entry["product"].strip()
+    first = vendor.split(" ")[0].casefold() if vendor else ""
+    if not vendor or (first and product.casefold().startswith(first)):
+        return product or vendor
+    if product.casefold() in vendor.casefold():
+        return vendor
+    return f"{vendor} {product}".strip()
+
+
+# Los roles mantienen la tabla legible para lectores de pantalla cuando en celular se muestra como fichas.
+ROW_HEAD = '<th scope="row" role="rowheader">'
+
+
+def table(heads: list[str], rows: str, label: str) -> str:
+    cols = "".join(f'<th scope="col" role="columnheader">{esc(h)}</th>' for h in heads)
+    return (f'<div class="table-wrap"><table class="vuln-table" role="table" aria-label="{esc(label)}">'
+            f'<thead role="rowgroup"><tr role="row">{cols}</tr></thead><tbody role="rowgroup">{rows}</tbody></table></div>')
+
+
+def cell(label: str, content: str, attrs: str = "") -> str:
+    return f'<td role="cell" data-label="{esc(label)}"{attrs}>{content}</td>'
+
+
 def kev_table(lang: Lang, entries: list[dict], compact: bool = False) -> str:
     foreign = ' lang="en"' if lang.code != "en" else ""
     rows = []
     for e in entries:
         tag = f'<span class="tag is-alert">{esc(lang["ransomware"])}</span>' if e["ransomware"] else ""
-        product = esc(f'{e["vendor"]} {e["product"]}'.strip())
-        flaw = "" if compact else f'<td data-label="{esc(lang["th_flaw"])}"{foreign}>{esc(e["name"])}{tag}</td>'
-        due = "" if compact else f'<td data-label="{esc(lang["th_due"])}">{esc(lang.date(e["due"])) if e["due"] else "—"}</td>'
-        rows.append(
-            f'<tr><th scope="row"><a class="cve" href="{esc(e["url"])}" target="_blank" rel="noopener noreferrer" translate="no">{esc(e["cve"])}</a></th>'
-            f'<td data-label="{esc(lang["th_product"])}" translate="no">{product}{tag if compact else ""}</td>{flaw}'
-            f'<td data-label="{esc(lang["th_added"])}"><time datetime="{esc(e["added"])}">{esc(lang.date(e["added"]))}</time></td>{due}'
-            f'<td data-label="{esc(lang["th_epss"])}">{epss_cell(lang, e)}</td></tr>'
-        )
-    head = [lang["th_cve"], lang["th_product"]] + ([] if compact else [lang["th_flaw"]]) + [lang["th_added"]]
-    head += ([] if compact else [lang["th_due"]]) + [lang["th_epss"]]
-    heads = "".join(f'<th scope="col">{esc(h)}</th>' for h in head)
-    return f'<div class="table-wrap"><table class="vuln-table"><thead><tr>{heads}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+        link = (f'<a class="cve" href="{esc(e["url"])}" target="_blank" rel="noopener noreferrer" translate="no">'
+                f'{esc(e["cve"])}</a>')
+        added = f'<time datetime="{esc(e["added"])}">{esc(lang.date(e["added"]))}</time>'
+        cells = [cell(lang["th_product"], esc(product_name(e)) + (tag if compact else ""), ' translate="no"')]
+        if not compact:
+            cells.append(cell(lang["th_flaw"], esc(e["name"]) + tag, foreign))
+        cells.append(cell(lang["th_added"], added))
+        if not compact:
+            cells.append(cell(lang["th_due"], esc(lang.date(e["due"])) if e["due"] else "—"))
+        cells.append(cell(lang["th_epss"], epss_cell(lang, e)))
+        rows.append(f'<tr role="row">{ROW_HEAD}{link}</th>{"".join(cells)}</tr>')
+    heads = [lang["th_cve"], lang["th_product"]] + ([] if compact else [lang["th_flaw"]]) + [lang["th_added"]]
+    heads += ([] if compact else [lang["th_due"]]) + [lang["th_epss"]]
+    return table(heads, "".join(rows), lang["kev_heading"])
 
 
 def nvd_table(lang: Lang, entries: list[dict]) -> str:
     foreign = ' lang="en"' if lang.code != "en" else ""
     rows = "".join(
-        f'<tr><th scope="row"><a class="cve" href="{esc(e["url"])}" target="_blank" rel="noopener noreferrer" translate="no">{esc(e["cve"])}</a></th>'
-        f'<td data-label="{esc(lang["th_cvss"])}"><span class="score">{e["score"]:.1f}</span></td>'
-        f'<td data-label="{esc(lang["th_desc"])}" class="desc"{foreign}>{esc(e["description"])}</td>'
-        f'<td data-label="{esc(lang["th_published"])}">{lang.time_tag(e["published"])}</td>'
-        f'<td data-label="{esc(lang["th_epss"])}">{epss_cell(lang, e)}</td></tr>'
+        f'<tr role="row">{ROW_HEAD}<a class="cve" href="{esc(e["url"])}" target="_blank" rel="noopener noreferrer" '
+        f'translate="no">{esc(e["cve"])}</a></th>'
+        + cell(lang["th_cvss"], f'<span class="score">{e["score"]:.1f}</span>')
+        + cell(lang["th_desc"], esc(e["description"]), f' class="desc"{foreign}')
+        + cell(lang["th_published"], lang.time_tag(e["published"]))
+        + cell(lang["th_epss"], epss_cell(lang, e)) + "</tr>"
         for e in entries
     )
-    heads = "".join(f'<th scope="col">{esc(h)}</th>' for h in
-                    (lang["th_cve"], lang["th_cvss"], lang["th_desc"], lang["th_published"], lang["th_epss"]))
-    return f'<div class="table-wrap"><table class="vuln-table"><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div>'
+    heads = [lang["th_cve"], lang["th_cvss"], lang["th_desc"], lang["th_published"], lang["th_epss"]]
+    return table(heads, rows, lang["nvd_heading"])
 
 
 def json_ld(data: dict) -> str:
@@ -650,6 +680,11 @@ class Site:
             stamp = f' · {esc(lang["updated"])} {lang.time_tag(updated)}' if updated else ""
             body = (
                 f'<p class="vuln-stats">{esc(stats)}{stamp}</p>'
+                f'<form class="tools" role="search" action="#" autocomplete="off"><label class="search">'
+                f'<span class="sr">{esc(lang["vuln_filter"])}</span>{SEARCH_ICON}'
+                f'<input id="vuln-filter" type="search" placeholder="{esc(lang["vuln_filter_ph"])}" '
+                f'enterkeyhint="search" spellcheck="false"></label></form>'
+                f'<p id="vuln-empty" class="notice" role="status" hidden>{esc(lang["vuln_none"])}</p>'
                 f'<section class="vuln-block" aria-labelledby="kev-title"><h2 id="kev-title" class="day">{esc(lang["kev_heading"])}</h2>'
                 f'<p class="strip-sub">{esc(lang["kev_sub"])}</p>{kev_table(lang, kev)}</section>'
                 f'<section class="vuln-block" aria-labelledby="nvd-title"><h2 id="nvd-title" class="day">{esc(lang["nvd_heading"])}</h2>'

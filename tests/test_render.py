@@ -185,6 +185,15 @@ class RenderTests(unittest.TestCase):
         self.assertIn("CVE-2026-3333", page)
         self.assertIn("42.0", page)
         self.assertIn("no lo respalda", page)
+        self.assertIn('id="vuln-filter"', page)
+        self.assertEqual(page.count('role="rowheader"'), 2)
+
+    def test_product_name_does_not_repeat_the_vendor(self):
+        for vendor, product, shown in (("PHP Group", "PHP", "PHP"), ("WordPress", "WordPress Core", "WordPress Core"),
+                                       ("Google", "Chromium", "Google Chromium"), ("Plex", "Media Server", "Plex Media Server"),
+                                       ("Barracuda Networks", "Barracuda Email Security Gateway", "Barracuda Email Security Gateway"),
+                                       ("", "Kernel", "Kernel")):
+            self.assertEqual(render.product_name({"vendor": vendor, "product": product}), shown)
         self.assertIn("Vulnerabilidades", (self.out / "index.html").read_text(encoding="utf-8"))
 
     def test_brand_assets_exist(self):
