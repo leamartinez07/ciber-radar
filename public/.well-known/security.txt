@@ -1,4 +1,4 @@
 Contact: mailto:leaamartinez7@gmail.com
-Expires: 2027-10-09T00:51:24Z
+Expires: 2027-10-09T01:00:25Z
 Preferred-Languages: es, en
 Canonical: https://ciber-radar.vercel.app/.well-known/security.txt
