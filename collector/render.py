@@ -555,15 +555,17 @@ class Site:
                 f'<strong>{alerts} {word}</strong> {esc(lang["in_24h"])} · {healthy}/{len(sources)} {esc(lang["sources"])}</span></span>')
 
     def wire(self, lang: Lang) -> str:
+        """Barra roja de la última alerta, con la actividad de los últimos 14 días a la derecha."""
         latest = next((i for i in self.items if i["alert"]), None)
+        chart = pulse(lang, self.items, self.now)
         if not latest:
-            return ""
+            return f'<aside class="wire" aria-label="{esc(lang["activity"])}">{chart}</aside>'
         attr = f' lang="{esc(latest.get("lang", "es"))}"' if latest.get("lang", "es") != lang.code else ""
         return (
-            f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}">'
-            f'<span class="wire-label">{esc(lang["latest_alert"])}</span>'
+            f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}"><div class="wire-news">'
+            f'<span class="wire-label"><span class="pulse" aria-hidden="true"></span>{esc(lang["latest_alert"])}</span>'
             f'<a{attr} href="{esc(safe_url(latest["url"]))}" target="_blank" rel="noopener noreferrer">{esc(latest["title"])}</a>'
-            f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></aside>'
+            f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></div>{chart}</aside>'
         )
 
     def nav(self, lang: Lang, current: str) -> str:
