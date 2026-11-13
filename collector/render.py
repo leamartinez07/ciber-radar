@@ -929,6 +929,9 @@ class Site:
     def build_static(self) -> None:
         for name in ("fonts", "icons"):
             shutil.copytree(self.source / name, self.out / name)
+        if (self.source / "muestras").is_dir():  # página temporal para elegir tipografía; no entra al sitemap
+            shutil.copytree(self.source / "muestras", self.out / "muestras", ignore=shutil.ignore_patterns("*.html"))
+            shutil.copy2(self.source / "muestras" / "tipografia.html", self.out / "tipografia.html")
         for name in ("og.png", "manifest.webmanifest", "favicon.ico"):
             shutil.copy2(self.source / name, self.out / name)
         self.write("data/latest.json", json.dumps({"items": self.items}, ensure_ascii=False, separators=(",", ":")))
