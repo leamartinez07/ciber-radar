@@ -333,18 +333,19 @@ def region_chip(lang: Lang, item: dict) -> str:
     return f'<span class="chip chip-{esc(item["region"])}">{esc(lang["regions"][item["region"]])}</span>'
 
 
-def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story") -> str:
+def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story", flag: bool = True) -> str:
     url = safe_url(item["url"])
     if not url:
         return ""
     item_lang = item.get("lang", "es")
     attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
-    flag = f'<span class="flag">{esc(lang["alert"])}</span>' if item["alert"] else ""
+    # En la columna de alertas la marca sobra: ahí todas lo son.
+    mark = f'<span class="flag">{esc(lang["alert"])}</span>' if item["alert"] and flag else ""
     topic = f'<span class="subject">{esc(lang.category(item["category"]))}</span> · ' if item["category"] != "General" else ""
     body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
     return (
         f'<article class="{css}" data-region="{esc(item["region"])}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
-        f'<p class="tags">{region_chip(lang, item)}{flag}</p>'
+        f'<p class="tags">{region_chip(lang, item)}{mark}</p>'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
         f'{body}<p class="meta">{topic}{esc(item["source"])} <span class="when">· {lang.time_tag(item["published"])}</span></p></article>'
     )
@@ -406,7 +407,7 @@ def pick_front(items: list[dict], now: dt.datetime) -> dict:
 
 def column(lang: Lang, title: str, items: list[dict], alert: bool = False) -> str:
     css = "column-title is-alert" if alert else "column-title"
-    return f'<div class="column"><h2 class="{css}">{esc(title)}</h2>{"".join(story(lang, i, summary=False) for i in items)}</div>'
+    return f'<div class="column"><h2 class="{css}">{esc(title)}</h2>{"".join(story(lang, i, summary=False, flag=not alert) for i in items)}</div>'
 
 
 def front_html(lang: Lang, front: dict) -> str:
@@ -668,8 +669,8 @@ class Site:
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preload" href="/fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/mona-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hubot-sans-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>

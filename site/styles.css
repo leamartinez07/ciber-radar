@@ -1,9 +1,9 @@
-@font-face { font-family: "Schibsted Grotesk"; src: url("/fonts/schibsted-grotesk-latin-wght-normal.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
-@font-face { font-family: "DM Serif Display"; src: url("/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: block; }
+@font-face { font-family: "Mona Sans"; src: url("/fonts/mona-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 200 900; font-display: swap; }
+@font-face { font-family: "Hubot Sans"; src: url("/fonts/hubot-sans-latin-900-normal.woff2") format("woff2"); font-weight: 900; font-display: block; }
 @font-face { font-family: "JetBrains"; src: url("/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 
-/* Diario de lectura cómoda: una sola grotesca de trazo parejo para todo, la RR de la marca con serifa,
-   esquinas redondeadas y un color por región. El rojo marca las alertas.
+/* Diario de lectura cómoda. Tipografía de GitHub: Mona Sans para todo y Hubot Sans para la RR de la marca.
+   Colores de región de Primer, el sistema de diseño de GitHub. Un solo rojo, el de la barra de alerta.
    Cada par texto/fondo pasa WCAG AA. El tema claro es el de entrada; el oscuro se elige con el botón. */
 :root {
   color-scheme: light;
@@ -20,12 +20,14 @@
   --band: #c8102e;
   --on-band: #ffffff;
   --brand-r: #c8102e;
-  --ar: #c2410c;    --on-ar: #ffffff;     /* naranja */
-  --latam: #1f7a3a; --on-latam: #ffffff;  /* verde */
-  --mundo: #6741d9; --on-mundo: #ffffff;  /* violeta */
+  --ar: #bc4c00;     /* naranja de Primer */
+  --latam: #1a7f37;  /* verde */
+  --mundo: #8250df;  /* violeta */
   --yellow: #f2a900; --on-yellow: #121212;
-  --sans: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --logo: "DM Serif Display", Georgia, serif;
+  --sans: "Mona Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --logo: "Hubot Sans", "Mona Sans", ui-sans-serif, sans-serif;
+  /* Pesos por tema: en oscuro el texto claro se ve más grueso (irradiación), así que baja un poco. */
+  --w-body: 420; --w-strong: 650; --w-head: 700; --w-title: 780; --track: 0em;
   --mono: "JetBrains", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(.23, 1, .32, 1);
   --r-xs: 4px;
@@ -37,16 +39,19 @@
   color-scheme: dark;
   --bg: #121212;
   --surface: #1d1d1d;
-  --ink: #f2f2f2;
-  --ink-2: #d0d0d0;
+  --ink: #ececec;
+  --ink-2: #cdcdcd;
   --muted: #a3a3a3;
+  --w-body: 380; --w-strong: 600; --w-head: 650; --w-title: 730; --track: .006em;
   --rule: #2e2e2e;
   --rule-strong: #f2f2f2;
   --grain: #5c5c5c;
-  --alert: #f2f2f2;
+  --alert: #ececec;
   --band: #c8102e;
   --brand-r: #c8102e;
-  --mundo: #7048e8;
+  --ar: #f0883e;
+  --latam: #3fb950;
+  --mundo: #a371f7;
 }
 
 /* Base */
@@ -58,7 +63,8 @@ body {
   padding: 0 max(28px, env(safe-area-inset-right)) 0 max(28px, env(safe-area-inset-left));
   background: var(--bg);
   color: var(--ink);
-  font: 400 1.125rem/1.65 var(--sans);
+  font: var(--w-body) 1.125rem/1.65 var(--sans);
+  letter-spacing: var(--track);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -107,13 +113,13 @@ svg { flex: none; }
 
 /* La marca: las dos R espalda con espalda, grandes y al centro; CIBE y ADAR entre dos filetes del alto de las R */
 .masthead { padding: 18px 0 22px; text-align: center; }
-.brand { margin: 0; font: 850 clamp(1.9rem, 6.6vw, 5rem)/.92 var(--sans); letter-spacing: -.01em; }
+.brand { margin: 0; font: 850 clamp(1.9rem, 6.6vw, 5rem)/.92 var(--sans); letter-spacing: -.012em; }
 .brand a { display: inline-flex; align-items: center; gap: .17em; color: var(--ink); }
 .side { display: block; height: 1.18em; padding: .08em .05em .03em; border-block: .085em solid currentColor; line-height: .9; text-transform: uppercase; }
-/* Cuerpo de la R = 1.18 / .672 del cuerpo de la marca: su mayúscula mide exactamente el alto de CIBE y ADAR.
-   El interlineado igual a la mayúscula y el ajuste de -.0145em dejan la R apoyada en el filete de abajo y tocando el de arriba. */
-.rr { display: inline-flex; height: .672em; font: 400 1.756em/.672 var(--logo); color: var(--brand-r); }
-.rr span { display: block; translate: 0 -.0145em; }
+/* Cuerpo de la R = 1.18 / .735 del cuerpo de la marca: la mayúscula de Hubot Sans mide exactamente el alto de CIBE y ADAR.
+   El interlineado igual a la mayúscula y el ajuste de -.0175em dejan la R tocando el filete de arriba y apoyada en el de abajo. */
+.rr { display: inline-flex; height: .735em; font: 900 1.6054em/.735 var(--logo); color: var(--brand-r); letter-spacing: 0; }
+.rr span { display: block; translate: 0 -.0175em; }
 .rr .r-flip { transform: scaleX(-1); }
 .motto { margin: 14px 0 0; font-size: 1.0625rem; font-weight: 500; color: var(--ink-2); }
 
@@ -138,7 +144,7 @@ svg { flex: none; }
 /* Última alerta: barra roja compacta con la actividad de los últimos 14 días */
 .wire {
   display: flex; align-items: center; justify-content: space-between; gap: 22px;
-  margin-top: 18px; padding: 13px 16px 13px 22px; border-radius: var(--r);
+  margin-top: 18px; padding: 13px 16px 13px 22px; border-radius: 8px;
   background: var(--band); color: var(--on-band);
 }
 .wire-news { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 14px; font-size: 1.0625rem; line-height: 1.35; font-weight: 650; }
@@ -173,13 +179,33 @@ svg { flex: none; }
   background-size: 6px 6px; background-repeat: no-repeat;
 }
 .tools select option { background: var(--bg); color: var(--ink); }
+@supports (appearance: base-select) {
+  .tools select, .tools select::picker(select) { appearance: base-select; }
+  .tools select { display: flex; align-items: center; background-image: none; padding-right: 18px; }
+  .tools select::picker-icon { content: ""; width: 9px; height: 9px; margin-left: auto; border: solid var(--ink); border-width: 0 2px 2px 0; rotate: 45deg; translate: 0 -2px; transition: rotate .2s var(--ease), translate .2s var(--ease); }
+  .tools select:open::picker-icon { rotate: 225deg; translate: 0 3px; }
+  .tools select::picker(select) {
+    margin-top: 8px; padding: 6px; min-width: anchor-size(width); border: 1px solid var(--rule); border-radius: 12px;
+    background: var(--bg); color: var(--ink); box-shadow: 0 2px 4px rgb(0 0 0 / .06), 0 18px 40px -16px rgb(0 0 0 / .35);
+    opacity: 0; translate: 0 -4px; transition: opacity .16s var(--ease), translate .16s var(--ease), overlay .16s allow-discrete, display .16s allow-discrete;
+  }
+  .tools select:open::picker(select) { opacity: 1; translate: 0 0; }
+  @starting-style { .tools select:open::picker(select) { opacity: 0; translate: 0 -4px; } }
+  .tools select option { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; border-radius: 8px; background: transparent; font-size: 1rem; cursor: pointer; }
+  .tools select option::checkmark { order: 1; margin-left: auto; content: "✓"; font-weight: 700; color: var(--ink); }
+  .tools select option:hover, .tools select option:focus-visible { background: var(--surface); outline: none; }
+  .tools select option:checked { font-weight: var(--w-strong); }
+  :root[data-theme="dark"] .tools select::picker(select) { background: var(--surface); border-color: #343434; }
+  :root[data-theme="dark"] .tools select option:hover, :root[data-theme="dark"] .tools select option:focus-visible { background: #2a2a2a; }
+}
 .topic { flex: 0 0 260px; }
 
 /* Portada: tres columnas */
 .front { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr) minmax(0, 1fr); gap: var(--gap); padding: 26px 0 40px; }
 .column-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; padding-bottom: 10px; border-bottom: 2px solid var(--rule-strong); font-size: 1.1875rem; font-weight: 750; letter-spacing: -.005em; word-spacing: .04em; }
-.column-title.is-alert { color: var(--alert); border-bottom-color: var(--red); }
-.lead-story h2 { margin: 4px 0 14px; font-size: clamp(1.875rem, 2.7vw, 2.625rem); font-weight: 700; line-height: 1.14; letter-spacing: -.01em; word-spacing: .03em; }
+.front > .column:first-child .column-title { border-bottom: 3px solid var(--ar); }
+.column-title.is-alert { padding: 10px 14px; border: 0; border-radius: 8px; background: var(--red); color: #fff; }
+.lead-story h2 { margin: 4px 0 14px; font-size: clamp(1.875rem, 2.7vw, 2.625rem); font-weight: var(--w-head); line-height: 1.14; letter-spacing: -.01em; word-spacing: .03em; }
 .lead-story .summary { max-width: 64ch; font-size: 1.25rem; line-height: 1.6; color: var(--ink); -webkit-line-clamp: unset; }
 .subleads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gap); margin-top: 26px; border-top: 1px solid var(--rule); }
 .subleads h3 { font-size: 1.3125rem; }
@@ -188,13 +214,15 @@ svg { flex: none; }
 /* Notas */
 .story { padding: 20px 0; border-bottom: 1px solid var(--rule); }
 .column .story:last-child { border-bottom: 0; }
-.tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; line-height: 1; }
-.chip { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: var(--r-xs); font-size: .8125rem; font-weight: 700; }
-.chip-ar { background: var(--ar); color: var(--on-ar); }
-.chip-latam { background: var(--latam); color: var(--on-latam); }
-.chip-mundo { background: var(--mundo); color: var(--on-mundo); }
-.flag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: var(--r-xs); background: var(--red); color: #fff; font-size: .8125rem; font-weight: 700; }
-.story h3 { margin: 0 0 10px; font-size: 1.1875rem; font-weight: 700; line-height: 1.28; letter-spacing: -.003em; word-spacing: .02em; }
+.tags { display: flex; flex-wrap: wrap; align-items: baseline; margin: 0 0 6px; font-size: .875rem; line-height: 1.3; }
+.chip { font-weight: var(--w-strong); }
+.chip-ar { color: var(--ar); }
+.chip-latam { color: var(--latam); }
+.chip-mundo { color: var(--mundo); }
+.flag { font-weight: var(--w-strong); color: var(--alert); }
+.flag::before { content: "·"; margin: 0 .45em; color: var(--muted); font-weight: 400; }
+:root:not([data-theme="dark"]) .flag { color: var(--red); }
+.story h3 { margin: 0 0 10px; font-size: 1.1875rem; font-weight: var(--w-head); line-height: 1.28; letter-spacing: -.003em; word-spacing: .02em; }
 .column .story h3 { font-size: 1.0625rem; }
 .story a, .lead-story a {
   text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: .16em;
@@ -208,19 +236,22 @@ svg { flex: none; }
 }
 .meta { margin: 0; font-size: .875rem; line-height: 1.5; color: var(--muted); }
 .meta .when, .meta time, .wire-meta { white-space: nowrap; }
-.subject { color: var(--ink); font-weight: 650; }
+.subject { color: var(--ink); font-weight: var(--w-strong); }
 .new { padding: 1px 7px; border-radius: var(--r-xs); background: var(--yellow); color: var(--on-yellow); font-weight: 700; }
 
 /* Bloques por región: título grande con el color de la región */
 .block, .data, .vuln-strip, .latest { margin-top: 12px; padding-top: 8px; }
 .block-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 10px 0 14px; border-bottom: 2px solid var(--rule-strong); }
-.block-head h2 { margin: 0; font-size: clamp(1.625rem, 2.4vw, 2.25rem); font-weight: 750; line-height: 1.15; letter-spacing: -.01em; word-spacing: .03em; }
+.block-head h2 { margin: 0; font-size: clamp(1.625rem, 2.4vw, 2.25rem); font-weight: var(--w-title); line-height: 1.15; letter-spacing: -.01em; word-spacing: .03em; }
 .block-more {
   flex: none; display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: var(--r-sm);
   background: var(--surface); font-size: .9375rem; font-weight: 650; white-space: nowrap; transition: background-color .18s var(--ease);
 }
 @media (hover: hover) { .block-more:hover { background: var(--rule); } }
 .block-sub { max-width: 72ch; margin: 16px 0 0; color: var(--ink-2); }
+.block:has(#block-ar) .block-head { border-bottom-color: var(--ar); }
+.block:has(#block-latam) .block-head { border-bottom-color: var(--latam); }
+.block:has(#block-mundo) .block-head { border-bottom-color: var(--mundo); }
 .block-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); padding: 10px 0 36px; }
 .block-grid .story { border-bottom: 0; }
 .block-grid .story h3 { font-size: 1.25rem; }
@@ -269,7 +300,7 @@ svg { flex: none; }
 @media (hover: hover) { .more a:hover { background: var(--red); color: #fff; } }
 
 .page-head { padding: 30px 0 18px; border-bottom: 2px solid var(--rule-strong); }
-.page-head h1 { margin: 0; font-size: clamp(2rem, 3.6vw, 3rem); font-weight: 750; line-height: 1.1; letter-spacing: -.012em; word-spacing: .03em; }
+.page-head h1 { margin: 0; font-size: clamp(2rem, 3.6vw, 3rem); font-weight: var(--w-title); line-height: 1.1; letter-spacing: -.012em; word-spacing: .03em; }
 .page-head p { max-width: 68ch; margin: 10px 0 0; font-size: 1.125rem; color: var(--ink-2); }
 .archive { margin: 0; padding: 0; list-style: none; }
 .archive li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--rule); }

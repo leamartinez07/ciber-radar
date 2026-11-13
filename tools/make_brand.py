@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Genera los íconos de la app, el favicon y la imagen para redes de Ciber Radar.
 
-La marca es tipográfica: las dos R del medio espalda con espalda (la de CIBER, espejada), en DM Serif
-Display y en rojo; CIBE y ADAR en Schibsted Grotesk entre dos filetes. Los íconos llevan solo las dos R.
+La marca es tipográfica: las dos R del medio espalda con espalda (la de CIBER, espejada), en Hubot Sans
+900 y en rojo, con el alto exacto de CIBE y ADAR; estos van en Mona Sans entre dos filetes. Los íconos
+llevan solo las dos R.
 
 Herramienta de desarrollo: usa Playwright con Chromium para pasar el HTML a PNG.
     PLAYWRIGHT_BROWSERS_PATH=… python tools/make_brand.py
@@ -23,8 +24,8 @@ PAPER, INK, GREY, RED = "#ffffff", "#111111", "#333333", "#c8102e"
 
 def fonts_css() -> str:
     fonts = (SITE / "fonts").resolve().as_uri()
-    return (f'@font-face {{ font-family: "Schibsted"; src: url("{fonts}/schibsted-grotesk-latin-wght-normal.woff2"); font-weight: 400 900; }}'
-            f'@font-face {{ font-family: "DM Serif"; src: url("{fonts}/dm-serif-display-latin-400-normal.woff2"); }}')
+    return (f'@font-face {{ font-family: "Mona"; src: url("{fonts}/mona-sans-latin-wght-normal.woff2"); font-weight: 200 900; }}'
+            f'@font-face {{ font-family: "Hubot"; src: url("{fonts}/hubot-sans-latin-900-normal.woff2"); font-weight: 900; }}')
 
 
 def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
@@ -34,8 +35,8 @@ def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-b {{ display: flex; font: 400 {unit * (.62 if rules else .9):.1f}px/.672 "DM Serif"; color: {RED}; {rule} }}
-i, u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0145em; }}
+b {{ display: flex; font: 900 {unit * (.6 if rules else .86):.1f}px/.735 "Hubot"; color: {RED}; {rule} }}
+i, u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0175em; }}
 i {{ transform: scaleX(-1); }}
 </style></head><body><b><i>R</i><u>R</u></b></body></html>'''
 
@@ -45,12 +46,12 @@ def og_html() -> str:
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
 .plate {{ display: flex; flex-direction: column; align-items: center; }}
-h1 {{ display: flex; align-items: center; gap: .17em; margin: 0; font: 850 118px/.92 "Schibsted"; letter-spacing: -.01em; white-space: nowrap; }}
+h1 {{ display: flex; align-items: center; gap: .17em; margin: 0; font: 850 118px/.92 "Mona"; letter-spacing: -.012em; white-space: nowrap; }}
 h1 .side {{ display: block; height: 1.18em; padding: .08em .05em .03em; border-block: .085em solid {INK}; line-height: .9; }}
-h1 .rr {{ display: flex; height: .672em; font: 400 1.756em/.672 "DM Serif"; color: {RED}; }}
-h1 .rr i, h1 .rr u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0145em; }}
+h1 .rr {{ display: flex; height: .735em; font: 900 1.6054em/.735 "Hubot"; color: {RED}; }}
+h1 .rr i, h1 .rr u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0175em; }}
 h1 .rr i {{ transform: scaleX(-1); }}
-p {{ margin: 36px 0 0; font: 500 30px/1.2 "Schibsted"; color: {GREY}; white-space: nowrap; }}
+p {{ margin: 36px 0 0; font: 480 30px/1.2 "Mona"; color: {GREY}; white-space: nowrap; }}
 </style></head><body><div class="plate"><h1><span class="side">CIBE</span><span class="rr"><i>R</i><u>R</u></span><span class="side">ADAR</span></h1>
 <p>Noticias de ciberseguridad de Argentina, Latinoamérica y el mundo</p></div></body></html>'''
 
