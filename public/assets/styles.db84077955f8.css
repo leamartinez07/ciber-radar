@@ -336,16 +336,17 @@ svg { flex: none; }
 .colophon { margin-top: 56px; padding: 26px 0 max(28px, env(safe-area-inset-bottom)); border-top: 5px solid var(--ink); color: var(--ink-2); font-size: .9375rem; }
 .foot-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
 .foot-brand p { margin: 10px 0 0; max-width: 46ch; }
-/* Marca de Ciber Radar en el pie: las RR entre dos líneas, con las mismas proporciones que la cabecera
-   (línea = .085em, espacio interno = .94em, R de cuerpo .94 / .688). */
-/* Logo a la izquierda, explicación y autor a la derecha */
-.foot-brand { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 22px; align-content: start; align-items: start; }
-.foot-logo { grid-row: 1 / span 2; display: inline-flex; font: 800 4.25rem/1 var(--display); font-stretch: 62%; color: var(--ink); }
+/* Marca de Ciber Radar en el pie y en el ícono: las RR entre dos líneas (línea = .085em, R de cuerpo .94 / .688,
+   o sea mayúscula de .94em), con .14em de aire entre las R y las líneas, arriba, abajo y a los costados. */
+/* Logo a la izquierda, del alto del texto; explicación a la derecha; autor abajo, contra el margen izquierdo */
+.foot-brand { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 24px; align-items: center; align-content: start; }
+.foot-logo { display: inline-flex; font: 800 4.6rem/1 var(--display); font-stretch: 62%; color: var(--ink); }
+.foot-brand .author { grid-column: 1 / -1; }
 .foot-brand > p:first-of-type { margin-top: 0; }
-.cr-mark { display: inline-flex; height: calc(.94em + .17em); padding: 0 .06em; border-block: .085em solid currentColor; }
+.cr-mark { display: inline-flex; align-items: center; height: calc(.94em + .28em + .17em); padding: 0 .14em; border-block: .085em solid currentColor; }
 .cr-mark span { display: block; font-size: 1.3663em; line-height: .688; translate: 0 .01em; color: var(--brand-r); }
 .cr-mark .r-flip { transform: scaleX(-1); margin-right: -.015em; }
-.foot-brand .author { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.foot-brand .author { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
 .author-label { font: 700 .8125rem/1 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
 /* Marca de Leandro Martinez: colores y letra de su portfolio, sin cambios */
 .lockup { display: inline-flex; align-items: center; gap: 10px; }
@@ -486,4 +487,4 @@ svg { flex: none; }
 :root[data-theme="dark"] :is(.column-title, .block-head h2, .page-head h1, .panel h3, .day, .country h4) { font-weight: 740; }
 :root[data-theme="dark"] :is(.sections, .lang-switch, .motto) { font-weight: 640; }
 :root[data-theme="dark"] :is(.meta, .wire-meta, .bars, .summary) { font-weight: 380; }
-@media (max-width: 680px) { .foot-logo { font-size: 3rem; } .foot-brand { column-gap: 16px; } }
+@media (max-width: 680px) { .foot-logo { font-size: 3.2rem; } .foot-brand { column-gap: 16px; } }

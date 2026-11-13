@@ -27,14 +27,14 @@ def fonts_css() -> str:
 
 
 def icon_html(size: int, scale: float = 1.0) -> str:
-    """El mismo dibujo que el logo del pie: las dos R entre una línea arriba y otra abajo, con las proporciones
-    de la cabecera (línea = .085em, espacio interno = .94em, R de cuerpo .94 / .688). scale achica para la zona segura."""
-    em = size * scale * .56 / 1.11  # el dibujo ocupa el 56 % del alto del ícono
+    """El mismo dibujo que el logo del pie: las dos R entre una línea arriba y otra abajo (línea = .085em,
+    mayúscula de .94em y .14em de aire alrededor). scale achica para la zona segura."""
+    em = size * scale * .6 / 1.39  # el dibujo (1.39em de alto) ocupa el 60 % del alto del ícono
     line = max(2.0, em * .085)
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; }}
-b {{ display: flex; box-sizing: border-box; height: {em * .94 + 2 * line:.2f}px; padding: 0 {em * .06:.2f}px; border-block: {line:.2f}px solid {INK};
+b {{ display: flex; align-items: center; box-sizing: border-box; height: {em * 1.22 + 2 * line:.2f}px; padding: 0 {em * .14:.2f}px; border-block: {line:.2f}px solid {INK};
      font: 800 {em:.2f}px/1 "Archivo"; font-stretch: 62%; }}
 i, u {{ display: block; font-style: normal; text-decoration: none; font-size: 1.3663em; line-height: .688; translate: 0 .01em; color: {RED}; }}
 i {{ transform: scaleX(-1); margin-right: -.015em; }}
