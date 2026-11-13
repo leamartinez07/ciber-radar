@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es tipográfica, como la cabecera de un diario: el nombre en Archivo angosta, con las dos R del medio espalda con espalda (la de CIBER va espejada). Los íconos llevan solo esas dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es tipográfica, como la cabecera de un diario: las dos R del medio van espalda con espalda, con las astas pegadas, grandes, al centro y en rojo (la de CIBER va espejada); CIBE y ADAR las acompañan entre dos filetes gruesos del alto de las R. Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## El radar en datos
 

@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 ICONS = SITE / "icons"
-PAPER, INK, GREY = "#ffffff", "#111111", "#333333"
+PAPER, INK, GREY, RED = "#ffffff", "#111111", "#333333", "#c8102e"
 
 
 def fonts_css() -> str:
@@ -34,8 +34,8 @@ def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-b {{ display: flex; font: 800 {unit * (.6 if rules else .86):.1f}px/.82 "Archivo"; font-stretch: 62%; {rule} }}
-i {{ font-style: normal; display: block; transform: scaleX(-1); margin-right: -.022em; }}
+b {{ display: flex; font: 800 {unit * (.62 if rules else .9):.1f}px/.82 "Archivo"; font-stretch: 62%; color: {RED}; {rule} }}
+i {{ font-style: normal; display: block; transform: scaleX(-1); margin-right: -.052em; }}
 </style></head><body><b><i>R</i>R</b></body></html>'''
 
 
@@ -43,12 +43,13 @@ def og_html() -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-.plate {{ width: 1040px; text-align: center; border-top: 4px solid {INK}; border-bottom: 10px solid {INK}; padding: 34px 0 30px; }}
-h1 {{ margin: 0; font: 800 212px/.86 "Archivo"; font-stretch: 62%; letter-spacing: -.012em; white-space: nowrap; }}
-h1 i {{ font-style: normal; display: inline-block; transform: scaleX(-1); margin: 0 -.022em 0 .035em; }}
-h1 u {{ text-decoration: none; margin-right: .035em; }}
-p {{ margin: 26px 0 0; font: 700 27px/1.2 "Archivo"; font-stretch: 80%; letter-spacing: .03em; color: {INK}; white-space: nowrap; }}
-</style></head><body><div class="plate"><h1>CIBE<i>R</i><u>R</u>ADAR</h1>
+.plate {{ display: flex; flex-direction: column; align-items: center; }}
+h1 {{ display: flex; align-items: center; margin: 0; font: 800 150px/.92 "Archivo"; font-stretch: 62%; white-space: nowrap; }}
+h1 .side {{ display: block; padding: .07em .04em .01em; border-block: .085em solid {INK}; line-height: .86; }}
+h1 .rr {{ display: flex; margin: 0 .05em; font-size: 1.62em; line-height: .735; color: {RED}; }}
+h1 .rr i {{ font-style: normal; display: block; transform: scaleX(-1); margin-right: -.052em; }}
+p {{ margin: 34px 0 0; font: 700 27px/1.2 "Archivo"; font-stretch: 80%; letter-spacing: .03em; color: {INK}; white-space: nowrap; }}
+</style></head><body><div class="plate"><h1><span class="side">CIBE</span><span class="rr"><i>R</i>R</span><span class="side">ADAR</span></h1>
 <p>NOTICIAS DE CIBERSEGURIDAD · ARGENTINA, LATINOAMÉRICA Y EL MUNDO</p></div></body></html>'''
 
 

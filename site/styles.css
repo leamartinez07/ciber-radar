@@ -16,6 +16,7 @@
   --grain: #8a8a8a;
   --alert: #c8102e;
   --on-alert: #ffffff;
+  --brand-r: #c8102e;
   --display: "Archivo", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
   --serif: "Source Serif", Georgia, "Times New Roman", serif;
   --mono: "JetBrains", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
@@ -31,6 +32,7 @@
   --grain: #6f6f6f;
   --alert: #ff5a5f;
   --on-alert: #101010;
+  --brand-r: #ff3b41;
 }
 
 /* Base */
@@ -89,15 +91,19 @@ svg { flex: none; }
 :root[data-theme="dark"] .theme-toggle .i-moon { display: block; }
 @media (hover: hover) { .lang-switch:hover { background: var(--ink); color: var(--bg); } }
 
-.masthead { padding: 16px 0 14px; text-align: center; border-bottom: 2px solid var(--ink); }
+.masthead { padding: 22px 0 16px; text-align: center; border-bottom: 2px solid var(--ink); }
 .brand {
   margin: 0;
-  font: 800 clamp(3rem, 11.5vw, 6.25rem)/.92 var(--display);
+  font: 800 clamp(2rem, 8.6vw, 5.4rem)/.92 var(--display);
   font-stretch: 62%; letter-spacing: -.012em; text-transform: uppercase;
 }
-.rr { display: inline-flex; margin: 0 .035em; }
-.rr span { display: inline-block; }
-.rr .r-flip { transform: scaleX(-1); margin-right: -.022em; }
+/* La marca: las dos R espalda con espalda, grandes y al centro, con las astas pegadas.
+   CIBE y ADAR las acompañan entre dos filetes gruesos que tienen el alto de las R. */
+.brand a { display: inline-flex; align-items: center; }
+.side { display: block; padding: .07em .04em .01em; border-block: .085em solid currentColor; line-height: .86; }
+.rr { display: inline-flex; margin: 0 .05em; font-size: 1.62em; line-height: .735; color: var(--brand-r); }
+.rr span { display: block; }
+.rr .r-flip { transform: scaleX(-1); margin-right: -.052em; }
 .motto { margin: 10px 0 0; font: 700 .9375rem/1.2 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); }
 
 /* Secciones */
@@ -353,6 +359,7 @@ svg { flex: none; }
   body { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
   .status { display: none; }
   .date { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .motto { font-size: .8125rem; }
   .sections { justify-content: flex-start; margin: 0 -16px; padding: 0 8px; }
   .sections a { padding: 0 9px; }
   .wire { flex-wrap: wrap; gap: 4px 12px; }
