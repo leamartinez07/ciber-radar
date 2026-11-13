@@ -41,8 +41,10 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Inter Tight (titulares), Manrope (interfaz, la misma del portfolio), Source Serif 4 (resúmenes) y JetBrains Mono (solo datos de la barra de alerta), con licencia SIL Open Font License 1.1. Las licencias están en `site/fonts/`.
+Archivo (Omnibus-Type, Buenos Aires) para la marca, los titulares y la interfaz: es variable en peso y ancho, y los titulares usan el corte angosto. Source Serif 4 para los resúmenes y JetBrains Mono solo para los identificadores CVE. Todas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
 
 ## Diseño
 
-Tema oscuro (el de entrada) y claro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA (el texto principal, AAA). El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+Diario en negro, blanco y un solo rojo: marca las alertas, la barra de última alerta, la sección activa y la señal del logo. Sin degradados, sombras ni esquinas redondeadas; las secciones se separan con filetes. El tema del titular y la marca de alerta van en la línea de datos, debajo del título. Tema oscuro (el de entrada) y claro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA (el texto principal, AAA). El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+
+Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI.

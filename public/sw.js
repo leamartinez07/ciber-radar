@@ -1,7 +1,7 @@
 "use strict";
 
-const CACHE = "ciber-radar-a1daa79c42a8";
-const PRECACHE = ["/", "/en", "/assets/styles.2819e49dfc9a.css", "/assets/app.e289c9cb02ed.js", "/assets/theme.38de132543d0.js", "/data/latest.json", "/icons/icon-192.png", "/fonts/inter-tight-latin-wght-normal.woff2", "/fonts/jetbrains-mono-latin-500-normal.woff2", "/fonts/manrope-latin-wght-normal.woff2", "/fonts/source-serif-4-latin-400-italic.woff2", "/fonts/source-serif-4-latin-400-normal.woff2", "/fonts/source-serif-4-latin-600-normal.woff2"];
+const CACHE = "ciber-radar-54581a90b863";
+const PRECACHE = ["/", "/en", "/assets/styles.78ee843a38a0.css", "/assets/app.c2ae314dad58.js", "/assets/theme.38de132543d0.js", "/data/latest.json", "/icons/icon-192.png", "/fonts/archivo-latin-wdth-normal.woff2", "/fonts/jetbrains-mono-latin-500-normal.woff2", "/fonts/source-serif-4-latin-400-normal.woff2", "/fonts/source-serif-4-latin-600-normal.woff2"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));
