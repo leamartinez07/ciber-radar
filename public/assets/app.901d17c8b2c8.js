@@ -269,19 +269,24 @@ function bindMap() {
   box.addEventListener("click", (event) => {
     const modeButton = event.target.closest(".map-modes button");
     if (modeButton) { mode = modeButton.dataset.mode; render(); return; }
-    const pick = event.target.closest(".spot, .country-pick");
+    const pick = event.target.closest(".spot-hit, .spot, .country-pick");
     if (pick) { code = pick.dataset.c; render(); }
   });
   map.addEventListener("pointermove", (event) => {
-    const spot = event.target.closest?.(".spot");
+    const spot = event.target.closest?.(".spot-hit");
+    map.querySelectorAll(".spot.is-hover").forEach((s) => s.classList.remove("is-hover"));
     if (!spot) { tip.hidden = true; return; }
+    spot.parentNode.querySelector(`.spot[data-c="${spot.dataset.c}"]`)?.classList.add("is-hover");
     const area = map.getBoundingClientRect();
     tip.textContent = spot.dataset.label;
     tip.style.left = `${event.clientX - area.left}px`;
     tip.style.top = `${event.clientY - area.top}px`;
     tip.hidden = false;
   });
-  map.addEventListener("pointerleave", () => { tip.hidden = true; });
+  map.addEventListener("pointerleave", () => {
+    tip.hidden = true;
+    map.querySelectorAll(".spot.is-hover").forEach((s) => s.classList.remove("is-hover"));
+  });
   render();
 }
 

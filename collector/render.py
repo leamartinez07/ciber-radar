@@ -56,6 +56,7 @@ LANGS = {
         "map_title": "Dónde pasa", "map_alt": "Mapa del mundo con un círculo por país mencionado. Los más nombrados: {top}.",
         "map_caption": "Países nombrados en titulares y resúmenes. El círculo crece con la cantidad de notas.",
         "rank_title": "Países más nombrados", "topics_title": "De qué se habla", "days_title": "Notas por día",
+        "regions_title": "Notas por región", "coverage": "{countries} países nombrados en {named} de las {total} notas.",
         "map_modes": "Qué contar", "map_all": "Todas las notas", "map_alerts": "Solo alertas",
         "map_pick": "Tocá un país en el mapa o en la lista para ver sus notas.", "country_news": "{name}: {n} {unit}",
         "trust_title": "De dónde viene la información",
@@ -131,6 +132,7 @@ LANGS = {
         "map_title": "Where it happens", "map_alt": "World map with one circle per country mentioned. Most named: {top}.",
         "map_caption": "Countries named in headlines and summaries. The circle grows with the number of stories.",
         "rank_title": "Most named countries", "topics_title": "What is being covered", "days_title": "Stories per day",
+        "regions_title": "Stories by region", "coverage": "{countries} countries named in {named} of the {total} stories.",
         "map_modes": "What to count", "map_all": "All stories", "map_alerts": "Alerts only",
         "map_pick": "Tap a country on the map or in the list to see its stories.", "country_news": "{name}: {n} {unit}",
         "trust_title": "Where the information comes from",
@@ -749,9 +751,14 @@ class Site:
             y = (MAP_TOP - country[3]) / (MAP_TOP - MAP_BOTTOM) * MAP_H
             radius = 5 + 27 * math.sqrt(n / peak)
             label = f'{country[name]}: {n} {lang["note_count"][0 if n == 1 else 1]}'
-            spots.append(f'<circle class="spot" data-c="{code}" data-label="{esc(label)}" cx="{x:.0f}" cy="{y:.0f}" r="{radius:.1f}">'
-                         f'<title>{esc(label)}</title></circle>')
-        return f'<g data-layer="{layer}">{"".join(spots)}</g>'
+            spots.append((n, code, x, y, radius, label))
+        visible = "".join(f'<circle class="spot" data-c="{c}" cx="{x:.0f}" cy="{y:.0f}" r="{r:.1f}"/>' for _, c, x, y, r, _ in spots)
+        # Zona de toque invisible de al menos 13 de radio: los países chicos se pueden tocar aunque estén al lado de uno grande.
+        hits = "".join(
+            f'<circle class="spot-hit" data-c="{c}" data-label="{esc(label)}" cx="{x:.0f}" cy="{y:.0f}" r="{max(r, 13):.1f}"><title>{esc(label)}</title></circle>'
+            for _, c, x, y, r, label in sorted(spots, key=lambda s: s[0], reverse=True)
+        )
+        return f'<g data-layer="{layer}">{visible}{hits}</g>'
 
     def country_list(self, lang: Lang, layer: str, counts: list[tuple[str, int]]) -> str:
         """Ranking de países: cada fila es un botón que muestra sus notas."""
@@ -761,14 +768,14 @@ class Site:
             f'<li><button class="bar-name country-pick" type="button" data-c="{code}" aria-pressed="false">{esc(COUNTRIES[code][name])}</button>'
             f'<progress max="{peak}" value="{n}" aria-hidden="true"></progress>'
             f'<span class="bar-n">{n}<span class="sr"> {esc(lang["note_count"][0 if n == 1 else 1])}</span></span></li>'
-            for code, n in counts[:8]
+            for code, n in counts[:14]
         )
         return f'<ol class="bars" data-layer="{layer}">{rows}</ol>'
 
     def country_news(self, lang: Lang, layer: str, found: dict[str, list[dict]], counts: list[tuple[str, int]], show_first: bool) -> str:
         name = 0 if lang.code == "es" else 1
         panels = []
-        for index, (code, n) in enumerate(counts[:12]):
+        for index, (code, n) in enumerate(counts):  # todos: cualquier país del mapa se puede elegir
             items = found[code][:5]
             heading = lang["country_news"].format(name=COUNTRIES[code][name], n=n, unit=lang["note_count"][0 if n == 1 else 1])
             rows = "".join(
@@ -812,6 +819,10 @@ class Site:
             return ""
         unit = lang["note_count"]
         map_html, ranking = self.world_map(lang)
+        regions = [(lang["regions"][r], n) for r, n in Counter(i["region"] for i in self.items).most_common()]
+        found = self.country_items()
+        named = len({i["id"] for v in found.values() for i in v})
+        coverage = lang["coverage"].format(countries=len(found), named=named, total=len(self.items))
         topics = Counter(i["category"] for i in self.items if i["category"] != "General").most_common(7)
         kinds = source_kinds()
         by_kind = Counter(kinds.get(i["source"], "prensa") for i in self.items)
@@ -822,7 +833,9 @@ class Site:
             f'<section class="data" aria-labelledby="data-title">{self.block_head(lang["data_title"], "data-title")}'
             f'<p class="block-sub">{esc(lang["data_sub"].format(n=len(self.items)))}</p>'
             f'<div class="data-top" data-mode="all"><div class="panel">{map_html}</div>'
-            f'<div class="panel"><h3>{esc(lang["rank_title"])}</h3>{ranking}</div></div>'
+            f'<div class="panel"><h3>{esc(lang["rank_title"])}</h3>{ranking}'
+            f'<h4 class="rank-sub">{esc(lang["regions_title"])}</h4>{self.bars(regions, unit)}'
+            f'<p class="coverage">{esc(coverage)}</p></div></div>'
             f'<div class="data-row"><div class="panel"><h3>{esc(lang["topics_title"])}</h3>'
             f'{self.bars([(lang.category(c), n) for c, n in topics], unit)}</div>'
             f'<div class="panel"><h3>{esc(lang["days_title"])}</h3>{pulse(lang, self.items, self.now)}</div>'
@@ -985,6 +998,11 @@ class Site:
     def build_static(self) -> None:
         for name in ("fonts", "icons"):
             shutil.copytree(self.source / name, self.out / name)
+        muestras = self.source / "muestras"  # páginas temporales para elegir diseño; con noindex y fuera del sitemap
+        if muestras.is_dir():
+            shutil.copytree(muestras, self.out / "muestras", ignore=shutil.ignore_patterns("*.html"))
+            for page in muestras.glob("*.html"):
+                shutil.copy2(page, self.out / page.name)
         for name in ("og.png", "manifest.webmanifest", "favicon.ico"):
             shutil.copy2(self.source / name, self.out / name)
         self.write("data/latest.json", json.dumps({"items": self.items}, ensure_ascii=False, separators=(",", ":")))

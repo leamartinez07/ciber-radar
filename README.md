@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es tipográfica, como la cabecera de un diario: CIBE y ADAR en Archivo angosta entre dos filetes, y en el medio las dos R espalda con espalda, en rojo, con la misma letra, tamaño y peso (la de CIBER va espejada). Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es tipográfica, como la cabecera de un diario: CIBE y ADAR en Archivo angosta entre dos filetes, y en el medio las dos R espalda con espalda, en rojo y con la misma letra, del alto exacto del bloque con sus filetes (la de CIBER va espejada). Las medidas están explicadas en `site/styles.css`. Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## El radar en datos
 
@@ -51,10 +51,10 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Una sola familia, Archivo (Omnibus-Type, Buenos Aires), variable en peso y ancho: angosta para la marca, el menú y los titulares, y de ancho normal para el texto, sin contraste de finos y gruesos. JetBrains Mono solo para los identificadores CVE. Licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
+Archivo (Omnibus-Type, Buenos Aires), variable en peso y ancho: angosta para la marca, el menú y los rótulos, y de ancho normal para el texto, sin contraste de finos y gruesos. Sofia Sans Condensed (Lettersoup) para los titulares. JetBrains Mono solo para los identificadores CVE. Licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8 y Sofia Sans Condensed de `@fontsource-variable/sofia-sans-condensed` 5.3.0.
 
 ## Diseño
 
-Diario clásico en blanco y negro, hasta 1520 px de ancho: filetes verticales entre columnas, bloques por región con título grande y un solo rojo, el de la barra de última alerta, para la marca y las alertas. El mapa de «El radar en datos» es interactivo: alterna todas las notas o solo alertas, y al tocar un país (en el mapa o en la lista) muestra sus últimas notas. El selector de temas usa el desplegable personalizable del navegador; donde no existe, queda el nativo. Hay tema claro (el de entrada) y oscuro, que se elige con el botón; en el oscuro cada peso baja un escalón, porque el texto claro sobre negro se ve más grueso. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+Diario clásico en blanco y negro, hasta 1520 px de ancho: filetes verticales entre columnas, bloques por región con título grande y un solo rojo, el de la barra de última alerta, para la marca y las alertas. El mapa de «El radar en datos» es interactivo: alterna todas las notas o solo alertas, y al tocar un país (en el mapa o en la lista) muestra sus últimas notas. Al lado, el ranking de países, las notas por región y la cobertura. El selector de temas usa el desplegable personalizable del navegador; donde no existe, queda el nativo. Hay tema claro (el de entrada) y oscuro, que se elige con el botón; en el oscuro cada peso baja un escalón, porque el texto claro sobre negro se ve más grueso. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
 
 Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI.
