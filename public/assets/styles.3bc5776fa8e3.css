@@ -1,5 +1,4 @@
 @font-face { font-family: "Archivo"; src: url("/fonts/archivo-latin-wdth-normal.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
-@font-face { font-family: "Sofia Sans Condensed"; src: url("/fonts/sofia-sans-condensed-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "JetBrains"; src: url("/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 
 /* Diario clásico: tinta sobre papel blanco, una sola familia (Archivo): angosta para la marca y los titulares,
@@ -20,7 +19,6 @@
   --band: #c8102e;
   --on-band: #ffffff;
   --display: "Archivo", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
-  --head: "Sofia Sans Condensed", "Archivo", "Arial Narrow", ui-sans-serif, sans-serif;  /* titulares */
   --serif: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;  /* texto: Archivo de ancho normal */
   --gap: clamp(20px, 2.2vw, 32px);
   --mono: "JetBrains", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
@@ -103,12 +101,13 @@ svg { flex: none; }
   font: 800 clamp(2rem, 8.6vw, 5.4rem)/.92 var(--display);
   font-stretch: 62%; letter-spacing: -.012em; text-transform: uppercase;
 }
-/* La marca: las dos R espalda con espalda, en rojo, con la misma letra que CIBE y ADAR. Miden de filete a filete:
-   lado = .86 + .07 + .01 + 2 × .085 = 1.11em; mayúscula de Archivo = .688 → cuerpo de la R = 1.11 / .688 = 1.6134em.
+/* La marca: las dos R espalda con espalda, en rojo, con la misma letra que CIBE y ADAR, pegadas a los costados.
+   Miden el espacio entre los filetes, de borde interno a borde interno: .86 + .07 + .01 = .94em;
+   mayúscula de Archivo = .688 → cuerpo de la R = .94 / .688 = 1.3663em.
    Con interlineado igual a la mayúscula, la R baja .01em (= -(ascendente .878 - descendente .21 - .688) / 2). */
-.brand a { display: inline-flex; align-items: center; gap: .09em; }
+.brand a { display: inline-flex; align-items: center; gap: .03em; }
 .side { display: block; padding: .07em .04em .01em; border-block: .085em solid currentColor; line-height: .86; }
-.rr { display: inline-flex; height: .688em; font-size: 1.6134em; line-height: .688; color: var(--brand-r); }
+.rr { display: inline-flex; height: .688em; font-size: 1.3663em; line-height: .688; color: var(--brand-r); }
 .rr span { display: block; translate: 0 .01em; }
 .rr .r-flip { transform: scaleX(-1); margin-right: -.015em; }
 .motto { margin: 10px 0 0; font: 700 .9375rem/1.2 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); }
@@ -202,8 +201,8 @@ svg { flex: none; }
 .column-title.is-alert { color: var(--alert); border-bottom-color: var(--alert); }
 .lead-story h2 {
   margin: 0 0 14px;
-  font: 800 clamp(2.25rem, 4.6vw, 3.75rem)/1.03 var(--head);
-  letter-spacing: -.004em;
+  font: 760 clamp(2.25rem, 4.6vw, 3.75rem)/1.02 var(--display);
+  font-stretch: 70%; letter-spacing: -.005em;
 }
 .lead-story .summary { max-width: 62ch; font-size: 1.1875rem; line-height: 1.55; color: var(--ink); -webkit-line-clamp: unset; }
 .subleads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; margin-top: 22px; border-top: 2px solid var(--ink); }
@@ -214,7 +213,7 @@ svg { flex: none; }
 /* Notas */
 .story { padding: 16px 0; border-bottom: 2px solid var(--rule); }
 .column .story:last-child, .subleads .story:nth-last-child(-n+2) { border-bottom: 0; }
-.story h3 { margin: 0 0 8px; font: 750 1.375rem/1.14 var(--head); letter-spacing: 0; }
+.story h3 { margin: 0 0 8px; font: 740 1.3125rem/1.12 var(--display); font-stretch: 72%; letter-spacing: 0; }
 .column .story h3 { font-size: 1.1875rem; }
 .story a, .lead-story a {
   text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: .14em;
@@ -236,7 +235,8 @@ svg { flex: none; }
 .block-head { position: relative; display: flex; justify-content: center; align-items: center; min-height: 86px; border-bottom: 5px solid var(--ink); }
 .block-head h2 {
   margin: 0; padding: 8px 0 6px;
-  font: 800 clamp(2.5rem, 7.4vw, 4.75rem)/1 var(--head); letter-spacing: -.01em; text-transform: uppercase; text-align: center;
+  font: 800 clamp(2.5rem, 7.4vw, 4.75rem)/1 var(--display);
+  font-stretch: 62%; letter-spacing: -.01em; text-transform: uppercase; text-align: center;
 }
 .block-more {
   position: absolute; right: 0; top: 50%; translate: 0 -50%; display: inline-flex; align-items: center; min-height: 40px;
@@ -305,7 +305,7 @@ svg { flex: none; }
 .river { padding-bottom: 8px; }
 .day {
   margin: 30px 0 0; padding-bottom: 8px; border-bottom: 3px solid var(--ink);
-  font: 700 1.75rem/1.1 var(--head); text-transform: uppercase; letter-spacing: .01em;
+  font: 700 1.75rem/1.1 var(--display); font-stretch: 68%; text-transform: uppercase; letter-spacing: .01em;
 }
 .day-block:first-child .day { margin-top: 20px; }
 .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); column-gap: 40px; }
@@ -322,11 +322,11 @@ svg { flex: none; }
 @media (hover: hover) { .more a:hover { background: var(--ink); color: var(--bg); } }
 
 .page-head { padding: 26px 0 8px; text-align: center; border-bottom: 5px solid var(--ink); }
-.page-head h1 { margin: 0; font: 800 clamp(2.75rem, 8vw, 5rem)/1 var(--head); letter-spacing: -.01em; text-transform: uppercase; }
+.page-head h1 { margin: 0; font: 800 clamp(2.75rem, 8vw, 5rem)/1 var(--display); font-stretch: 62%; letter-spacing: -.01em; text-transform: uppercase; }
 .page-head p { max-width: 66ch; margin: 10px auto 12px; color: var(--ink-2); }
 .archive { margin: 0; padding: 0; list-style: none; }
 .archive li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
-.archive a { font: 700 1.75rem/1.1 var(--head); text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.archive a { font: 700 1.75rem/1.1 var(--display); font-stretch: 68%; text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 5px; }
 @media (hover: hover) { .archive a:hover { text-decoration-color: currentColor; } }
 .archive span { font-size: .875rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 

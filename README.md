@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es tipográfica, como la cabecera de un diario: CIBE y ADAR en Archivo angosta entre dos filetes, y en el medio las dos R espalda con espalda, en rojo y con la misma letra, del alto exacto del bloque con sus filetes (la de CIBER va espejada). Las medidas están explicadas en `site/styles.css`. Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es tipográfica, como la cabecera de un diario: CIBE y ADAR en Archivo angosta entre dos filetes, y en el medio las dos R espalda con espalda, en rojo y con la misma letra, del alto del espacio entre los filetes y pegadas a los costados (la de CIBER va espejada). Las medidas están explicadas en `site/styles.css`. Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## El radar en datos
 
@@ -51,7 +51,7 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Archivo (Omnibus-Type, Buenos Aires), variable en peso y ancho: angosta para la marca, el menú y los rótulos, y de ancho normal para el texto, sin contraste de finos y gruesos. Sofia Sans Condensed (Lettersoup) para los titulares. JetBrains Mono solo para los identificadores CVE. Licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8 y Sofia Sans Condensed de `@fontsource-variable/sofia-sans-condensed` 5.3.0.
+Archivo (Omnibus-Type, Buenos Aires), variable en peso y ancho: angosta para la marca, el menú, los rótulos y los titulares, y de ancho normal para el texto, sin contraste de finos y gruesos. JetBrains Mono solo para los identificadores CVE. Licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
 
 ## Diseño
 

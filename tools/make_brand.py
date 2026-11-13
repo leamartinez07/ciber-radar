@@ -43,9 +43,9 @@ def og_html() -> str:
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
 .plate {{ display: flex; flex-direction: column; align-items: center; }}
-h1 {{ display: flex; align-items: center; gap: .09em; margin: 0; font: 800 150px/.92 "Archivo"; font-stretch: 62%; white-space: nowrap; }}
+h1 {{ display: flex; align-items: center; gap: .03em; margin: 0; font: 800 170px/.92 "Archivo"; font-stretch: 62%; white-space: nowrap; }}
 h1 .side {{ display: block; padding: .07em .04em .01em; border-block: .085em solid {INK}; line-height: .86; }}
-h1 .rr {{ display: flex; height: .688em; font-size: 1.6134em; line-height: .688; color: {RED}; }}
+h1 .rr {{ display: flex; height: .688em; font-size: 1.3663em; line-height: .688; color: {RED}; }}
 h1 .rr i, h1 .rr u {{ font-style: normal; text-decoration: none; display: block; translate: 0 .01em; }}
 h1 .rr i {{ transform: scaleX(-1); margin-right: -.015em; }}
 p {{ margin: 34px 0 0; font: 700 27px/1.2 "Archivo"; font-stretch: 80%; letter-spacing: .03em; color: {INK}; white-space: nowrap; }}

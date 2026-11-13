@@ -15,24 +15,18 @@ body { margin: 0; color: #111; font: 400 17px/1.5 "Archivo", system-ui, sans-ser
 .light { background: #fff; color: #111; }
 .dark { background: #101010; color: #ececec; }
 
-/* Base: la marca del sitio */
-.brand { display: inline-flex; align-items: center; gap: .09em; font: 800 clamp(2rem, 6vw, 4.6rem)/.92 "Archivo"; font-stretch: 62%; letter-spacing: -.012em; }
+/* Base: la marca del sitio. Bloque lateral: .86 + .07 + .01 = .94em por dentro, 1.11em con los filetes;
+   mayúscula de Archivo = .688 del cuerpo. */
+.brand { display: inline-flex; align-items: center; gap: .03em; font: 800 clamp(2rem, 6vw, 4.6rem)/.92 "Archivo"; font-stretch: 62%; letter-spacing: -.012em; }
 .side { display: block; padding: .07em .04em .01em; border-block: .085em solid currentColor; line-height: .86; }
-.rr { display: inline-flex; height: .688em; font-size: 1.6134em; line-height: .688; color: #c8102e; }
+.rr { display: inline-flex; height: .688em; font-size: 1.3663em; line-height: .688; color: #c8102e; }
 .rr span { display: block; translate: 0 .01em; }
 .r-flip { transform: scaleX(-1); margin-right: -.015em; }
 
-/* Variantes (mayúscula de Archivo = .688 del cuerpo; bloque lateral = 1.11em) */
-.v2 .brand { align-items: baseline; }
-.v2 .rr { height: auto; font-size: 1em; line-height: .86; }
-.v2 .rr span { translate: none; }
-.v3 .rr { height: .688em; font-size: 1.3em; }
-.v4 .rr { height: .688em; font-size: 1.9em; }
-.v5 .rr { font-stretch: 78%; }
-.v6 .rr { font-stretch: 100%; }
-.v7 .brand { gap: 0; }
-.v8 .brand { gap: .24em; }
-.v9 .side { border-block-width: .045em; padding: .06em .04em .02em; }
-.v9 .rr { font-size: 1.4826em; } /* bloque = .86 + .08 + .09 = 1.03em → 1.03 / .688 */
+.v2 .brand { gap: 0; }
+.v3 .brand { gap: .08em; }
+.v4 .rr { font-size: 1.4899em; }   /* .94 + .085 = 1.025em → 1.025 / .688 */
+.v5 .rr { font-stretch: 76%; }
+.v6 .side { border-block-width: .045em; }
 
 @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } .pair > div { min-height: 140px; } }
