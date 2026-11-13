@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es tipográfica, como la cabecera de un diario: el nombre en Archivo angosta entre filetes, sin emblema. Los íconos llevan las iniciales CR. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es tipográfica, como la cabecera de un diario: el nombre en Archivo angosta, con las dos R del medio espalda con espalda (la de CIBER va espejada). Los íconos llevan solo esas dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## El radar en datos
 
@@ -51,10 +51,10 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Archivo (Omnibus-Type, Buenos Aires) en su corte angosto para la cabecera, los títulos de sección y los titulares. Source Serif 4 para el texto, los resúmenes y las líneas de datos en versalitas. JetBrains Mono solo para los identificadores CVE. Todas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
+Archivo (Omnibus-Type, Buenos Aires) en su corte angosto para la cabecera, los títulos de sección y los titulares. Source Serif 4 solo para los resúmenes y el texto corrido; las líneas de datos, el menú y los rótulos van en Archivo. JetBrains Mono solo para los identificadores CVE. Todas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
 
 ## Diseño
 
-Diario clásico: tinta sobre papel blanco, filetes finos, tres columnas en la tapa y bloques por región con el título grande y centrado. El rojo se reserva para las alertas. El tema y la ficha de alerta van en la línea de datos, debajo del título. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+Diario clásico: tinta sobre papel blanco, filetes gruesos, tres columnas en la tapa y bloques por región con el título grande y centrado. El rojo se reserva para las alertas, que van como palabra en rojo, sin recuadro. El tema y la ficha de alerta van en la línea de datos, debajo del título. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
 
 Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI.

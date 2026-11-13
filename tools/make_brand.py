@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Genera los íconos de la app, el favicon y la imagen para redes de Ciber Radar.
 
-La marca es tipográfica, como la cabecera de un diario: el nombre en Archivo angosta entre filetes.
-Los íconos llevan las iniciales CR con el mismo criterio. No hay emblema dibujado.
+La marca es tipográfica, como la cabecera de un diario: el nombre en Archivo angosta, con las dos R
+del medio espalda con espalda (la de CIBER, espejada). Los íconos llevan solo esas dos R.
 
 Herramienta de desarrollo: usa Playwright con Chromium para pasar el HTML a PNG.
     PLAYWRIGHT_BROWSERS_PATH=… python tools/make_brand.py
@@ -28,24 +28,27 @@ def fonts_css() -> str:
 
 
 def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
-    """Iniciales CR entre dos filetes. scale achica el dibujo para la zona segura de los íconos adaptables."""
+    """Las dos R espalda con espalda entre dos filetes. scale achica el dibujo para la zona segura."""
     unit = size * scale
     rule = f"border-block: {max(1, round(unit * .028))}px solid {INK}; padding: {unit * .035:.1f}px 0 {unit * .012:.1f}px;" if rules else ""
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-b {{ display: block; font: 800 {unit * (.6 if rules else .86):.1f}px/.82 "Archivo"; font-stretch: 62%; letter-spacing: -.02em; {rule} }}
-</style></head><body><b>CR</b></body></html>'''
+b {{ display: flex; font: 800 {unit * (.6 if rules else .86):.1f}px/.82 "Archivo"; font-stretch: 62%; {rule} }}
+i {{ font-style: normal; display: block; transform: scaleX(-1); margin-right: -.022em; }}
+</style></head><body><b><i>R</i>R</b></body></html>'''
 
 
 def og_html() -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-.plate {{ width: 1040px; text-align: center; border-top: 2px solid {INK}; border-bottom: 6px double {INK}; padding: 34px 0 30px; }}
+.plate {{ width: 1040px; text-align: center; border-top: 4px solid {INK}; border-bottom: 10px solid {INK}; padding: 34px 0 30px; }}
 h1 {{ margin: 0; font: 800 212px/.86 "Archivo"; font-stretch: 62%; letter-spacing: -.012em; white-space: nowrap; }}
-p {{ margin: 26px 0 0; font: 600 19px/1.2 "Source Serif"; letter-spacing: .18em; color: {GREY}; white-space: nowrap; }}
-</style></head><body><div class="plate"><h1>CIBER RADAR</h1>
+h1 i {{ font-style: normal; display: inline-block; transform: scaleX(-1); margin: 0 -.022em 0 .035em; }}
+h1 u {{ text-decoration: none; margin-right: .035em; }}
+p {{ margin: 26px 0 0; font: 700 27px/1.2 "Archivo"; font-stretch: 80%; letter-spacing: .03em; color: {INK}; white-space: nowrap; }}
+</style></head><body><div class="plate"><h1>CIBE<i>R</i><u>R</u>ADAR</h1>
 <p>NOTICIAS DE CIBERSEGURIDAD · ARGENTINA, LATINOAMÉRICA Y EL MUNDO</p></div></body></html>'''
 
 
