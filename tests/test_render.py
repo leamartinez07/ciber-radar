@@ -196,6 +196,24 @@ class RenderTests(unittest.TestCase):
             self.assertEqual(render.product_name({"vendor": vendor, "product": product}), shown)
         self.assertIn("Vulnerabilidades", (self.out / "index.html").read_text(encoding="utf-8"))
 
+    def test_home_shows_the_radar_in_numbers(self):
+        home = (self.out / "index.html").read_text(encoding="utf-8")
+        self.assertIn('<figure class="map">', home)
+        self.assertIn('class="land"', home)
+        self.assertIn('<ol class="bars">', home)
+        self.assertIn("De dónde viene la información", home)
+        self.assertIn("Where the information comes from", (self.out / "en.html").read_text(encoding="utf-8"))
+
+    def test_pages_carry_no_inline_styles(self):
+        # La política de seguridad solo admite la hoja de estilos propia.
+        for path in self.pages():
+            self.assertIsNone(re.search(r'\sstyle="', path.read_text(encoding="utf-8")), path.name)
+
+    def test_country_terms_match_whole_words(self):
+        self.assertTrue(render.COUNTRY_PATTERNS["us"].search("ataque en estados unidos"))
+        self.assertFalse(render.COUNTRY_PATTERNS["in"].search("indiana jones"))
+        self.assertFalse(render.COUNTRY_PATTERNS["cu"].search("cubadebate"))
+
     def test_brand_assets_exist(self):
         for name in ("favicon.ico", "og.png", "icons/icon.svg", "icons/apple-touch-icon.png", "icons/icon-maskable-512.png"):
             self.assertTrue((self.out / name).is_file(), name)

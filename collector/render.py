@@ -13,15 +13,18 @@ import email.utils
 import hashlib
 import html
 import json
+import math
 import os
+import re
 import shutil
 import sys
+import tomllib
 from collections import Counter
 from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from collect import safe_url, title_words  # noqa: E402
+from collect import norm, safe_url, title_words  # noqa: E402
 
 AR = dt.timezone(dt.timedelta(hours=-3))
 CRITICAL_TOPICS = {"Vulnerabilidades", "Ransomware", "Filtraciones"}
@@ -46,6 +49,18 @@ LANGS = {
         "regions": {"ar": "Argentina", "latam": "Latinoamérica", "mundo": "Mundo"},
         "categories": {},
         "tagline": "Toda la ciberseguridad, a medida que sale.",
+        "masthead_sub": "Noticias de ciberseguridad · Argentina, Latinoamérica y el mundo",
+        "today_label": "Hoy:", "view_all": "Ver todo", "latest_title": "Últimas noticias",
+        "data_title": "El radar en datos",
+        "data_sub": "Qué países, qué temas y qué fuentes aparecen en las {n} notas más recientes.",
+        "map_title": "Dónde pasa", "map_alt": "Mapa del mundo con un círculo por país mencionado. Los más nombrados: {top}.",
+        "map_caption": "Países nombrados en titulares y resúmenes. El círculo crece con la cantidad de notas.",
+        "rank_title": "Países más nombrados", "topics_title": "De qué se habla", "days_title": "Notas por día",
+        "trust_title": "De dónde viene la información",
+        "trust_kinds": {"oficial": "Organismos oficiales", "investigacion": "Investigación propia",
+                        "especializado": "Medios especializados", "prensa": "Prensa general verificada"},
+        "trust_note": "{ok} de {total} fuentes respondieron en la última actualización. De la prensa general solo entran medios de una lista revisada a mano.",
+        "note_count": ("nota", "notas"),
         "home_title": "Ciber Radar: noticias de ciberseguridad de Argentina y el mundo",
         "home_description": "Noticias de ciberseguridad de Argentina, Latinoamérica y el mundo, y vulnerabilidades explotadas en tiempo real. Fuentes verificadas, cada 30 minutos.",
         "home": "Portada", "front": "Portada", "alert": "Alerta", "skip": "Saltar a las noticias",
@@ -107,6 +122,18 @@ LANGS = {
                        "Deepfakes e IA": "Deepfakes & AI", "Vulnerabilidades": "Vulnerabilities",
                        "Malware": "Malware", "Estado y defensa": "Government & defense", "General": "General"},
         "tagline": "All of cybersecurity, as it breaks.",
+        "masthead_sub": "Cybersecurity news · Argentina, Latin America and the world",
+        "today_label": "Today:", "view_all": "View all", "latest_title": "Latest news",
+        "data_title": "The radar in numbers",
+        "data_sub": "Which countries, topics and sources appear in the {n} most recent stories.",
+        "map_title": "Where it happens", "map_alt": "World map with one circle per country mentioned. Most named: {top}.",
+        "map_caption": "Countries named in headlines and summaries. The circle grows with the number of stories.",
+        "rank_title": "Most named countries", "topics_title": "What is being covered", "days_title": "Stories per day",
+        "trust_title": "Where the information comes from",
+        "trust_kinds": {"oficial": "Official bodies", "investigacion": "Original research",
+                        "especializado": "Specialist outlets", "prensa": "Verified general press"},
+        "trust_note": "{ok} of {total} sources answered in the last update. From the general press, only outlets on a hand-reviewed list are included.",
+        "note_count": ("story", "stories"),
         "home_title": "Ciber Radar: cybersecurity news from Argentina, Latin America and the world",
         "home_description": "Cybersecurity news from Argentina, Latin America and the world, plus exploited vulnerabilities in real time. Verified sources, every 30 minutes.",
         "home": "Home", "front": "Front page", "alert": "Alert", "skip": "Skip to the news",
@@ -161,12 +188,65 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
-# La C de la marca: tres anillos de radar abiertos hacia la señal detectada. Un solo color.
-EMBLEM = (
-    '<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">'
-    '<path d="M86.8 23.3A45.5 45.5 0 1 0 86.8 76.7"/><path d="M74.3 32.4A30.0 30.0 0 1 0 74.3 67.6"/>'
-    '<path d="M61.7 41.5A14.5 14.5 0 1 0 61.7 58.5"/><circle class="blip" cx="86" cy="50" r="7"/></svg>'
-)
+# Mapa: contorno de Natural Earth 1:110m (dominio público), ya proyectado a una caja de 1000 × 460
+# que va de 84° N a 58° S. Lo genera tools/make_map.py.
+MAP_W, MAP_H, MAP_TOP, MAP_BOTTOM = 1000, 460, 84, -58
+WORLD_LAND = (Path(__file__).resolve().parent / "world_land.txt").read_text(encoding="utf-8").strip()
+# País: nombre en español, en inglés, longitud, latitud y los términos que lo delatan en un texto sin acentos.
+COUNTRIES = {
+    "ar": ("Argentina", "Argentina", -64, -35, ["argentina", "argentinas", "argentino", "argentinos", "buenos aires"]),
+    "br": ("Brasil", "Brazil", -52, -10, ["brasil", "brazil", "brasileno", "brasilena", "brazilian"]),
+    "cl": ("Chile", "Chile", -71, -33, ["chile", "chileno", "chilena", "chilean"]),
+    "uy": ("Uruguay", "Uruguay", -56, -33, ["uruguay", "uruguayo", "uruguaya"]),
+    "py": ("Paraguay", "Paraguay", -58, -23, ["paraguay", "paraguayo", "paraguaya"]),
+    "bo": ("Bolivia", "Bolivia", -65, -17, ["bolivia", "boliviano", "boliviana"]),
+    "pe": ("Perú", "Peru", -75, -10, ["peru", "peruano", "peruana", "peruvian"]),
+    "ec": ("Ecuador", "Ecuador", -78, -1.5, ["ecuador", "ecuatoriano", "ecuatoriana"]),
+    "co": ("Colombia", "Colombia", -73, 4, ["colombia", "colombiano", "colombiana", "colombian"]),
+    "ve": ("Venezuela", "Venezuela", -66, 7, ["venezuela", "venezolano", "venezolana"]),
+    "mx": ("México", "Mexico", -102, 23, ["mexico", "mexicano", "mexicana", "mexican"]),
+    "cr": ("Costa Rica", "Costa Rica", -84, 10, ["costa rica"]),
+    "pa": ("Panamá", "Panama", -80, 8.5, ["panama"]),
+    "do": ("República Dominicana", "Dominican Republic", -70, 19, ["republica dominicana", "dominican republic"]),
+    "gt": ("Guatemala", "Guatemala", -90, 15.5, ["guatemala"]),
+    "cu": ("Cuba", "Cuba", -79, 21.5, ["cuba"]),
+    "us": ("Estados Unidos", "United States", -98, 39, ["estados unidos", "ee uu", "eeuu", "united states", "u s", "usa", "estadounidense", "pentagono", "pentagon"]),
+    "ca": ("Canadá", "Canada", -106, 56, ["canada", "canadian", "canadiense"]),
+    "gb": ("Reino Unido", "United Kingdom", -2, 54, ["reino unido", "united kingdom", "uk", "britain", "british", "britanico", "britanica"]),
+    "es": ("España", "Spain", -3.7, 40, ["espana", "espanol", "espanola", "spain", "spanish"]),
+    "fr": ("Francia", "France", 2.5, 46.5, ["francia", "frances", "francesa", "france", "french"]),
+    "de": ("Alemania", "Germany", 10, 51, ["alemania", "aleman", "alemana", "germany", "german"]),
+    "it": ("Italia", "Italy", 12.5, 42.5, ["italia", "italiano", "italiana", "italy", "italian"]),
+    "nl": ("Países Bajos", "Netherlands", 5.5, 52.3, ["paises bajos", "holanda", "netherlands", "dutch"]),
+    "pl": ("Polonia", "Poland", 19.5, 52, ["polonia", "poland", "polish"]),
+    "ua": ("Ucrania", "Ukraine", 31, 49, ["ucrania", "ucraniano", "ukraine", "ukrainian"]),
+    "ru": ("Rusia", "Russia", 60, 58, ["rusia", "ruso", "rusa", "rusos", "russia", "russian", "kremlin"]),
+    "tr": ("Turquía", "Turkey", 35, 39, ["turquia", "turkey", "turkiye", "turkish"]),
+    "il": ("Israel", "Israel", 35, 31.3, ["israel", "israeli"]),
+    "ir": ("Irán", "Iran", 53, 32.5, ["iran", "irani", "iranian"]),
+    "in": ("India", "India", 79, 22, ["india", "indian"]),
+    "cn": ("China", "China", 104, 35, ["china", "chino", "chinos", "chinese", "beijing", "pekin"]),
+    "kp": ("Corea del Norte", "North Korea", 127, 40, ["corea del norte", "north korea", "north korean", "norcoreano", "norcoreanos", "lazarus"]),
+    "kr": ("Corea del Sur", "South Korea", 127.8, 36, ["corea del sur", "south korea", "south korean", "surcoreano"]),
+    "jp": ("Japón", "Japan", 138, 36.5, ["japon", "japones", "japan", "japanese"]),
+    "tw": ("Taiwán", "Taiwan", 121, 23.7, ["taiwan"]),
+    "au": ("Australia", "Australia", 134, -25, ["australia", "australian", "australiano"]),
+    "za": ("Sudáfrica", "South Africa", 24, -29, ["sudafrica", "south africa"]),
+    "ng": ("Nigeria", "Nigeria", 8, 9.5, ["nigeria", "nigerian", "nigeriano"]),
+}
+COUNTRY_PATTERNS = {
+    code: re.compile(r"(?<![a-z0-9])(?:" + "|".join(re.escape(t) for t in terms) + r")(?![a-z0-9])")
+    for code, (_, _, _, _, terms) in COUNTRIES.items()
+}
+TRUST_ORDER = ["oficial", "investigacion", "especializado", "prensa"]
+
+
+def source_kinds() -> dict[str, str]:
+    """Tipo de cada fuente directa, según feeds.toml. Lo que llega por un agregador es prensa general."""
+    config = tomllib.loads((Path(__file__).resolve().parent.parent / "feeds.toml").read_text(encoding="utf-8"))
+    return {f["name"]: f.get("kind", "especializado") for f in config["feeds"] if not f.get("aggregator")}
+
+
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
@@ -348,7 +428,7 @@ def pulse(lang: Lang, items: list[dict], now: dt.datetime) -> str:
         label = lang["pulse_day"].format(day=lang.date(day.isoformat()), n=counts[day])
         bars.append(
             f'<g><title>{esc(label)}</title><rect class="hit" x="{index * 12}" y="0" width="12" height="36"/>'
-            f'<rect class="{css}" x="{index * 12 + 2}" y="{36 - height}" width="8" height="{height}" rx="2"/></g>'
+            f'<rect class="{css}" x="{index * 12 + 2}" y="{36 - height}" width="8" height="{height}"/></g>'
         )
     summary = lang["pulse_summary"].format(peak=peak, today=counts[today])
     return (
@@ -476,15 +556,14 @@ class Site:
 
     def wire(self, lang: Lang) -> str:
         latest = next((i for i in self.items if i["alert"]), None)
-        chart = pulse(lang, self.items, self.now)
         if not latest:
-            return f'<aside class="wire" aria-label="{esc(lang["activity"])}">{chart}</aside>'
+            return ""
         attr = f' lang="{esc(latest.get("lang", "es"))}"' if latest.get("lang", "es") != lang.code else ""
         return (
             f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}">'
-            f'<div class="wire-news"><span class="wire-label"><span class="pulse" aria-hidden="true"></span>{esc(lang["latest_alert"])}</span>'
+            f'<span class="wire-label">{esc(lang["latest_alert"])}</span>'
             f'<a{attr} href="{esc(safe_url(latest["url"]))}" target="_blank" rel="noopener noreferrer">{esc(latest["title"])}</a>'
-            f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></div>{chart}</aside>'
+            f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></aside>'
         )
 
     def nav(self, lang: Lang, current: str) -> str:
@@ -539,7 +618,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="sr">C</span><span class="thin">iber</span>Radar</a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">Ciber Radar</a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}
@@ -563,7 +642,7 @@ class Site:
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{esc(canonical)}">
 {hreflang if indexable else ""}
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#ffffff">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
 <meta property="og:type" content="website">
@@ -583,6 +662,7 @@ class Site:
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-serif-4-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>
@@ -591,10 +671,10 @@ class Site:
 <body>
 <a class="skip" href="#contenido">{esc(lang["skip"])}</a>
 <header>
-<div class="topbar"><span id="today">{esc(lang.day(self.now.astimezone(AR).date()))}</span><div class="topbar-right">{self.status_line(lang)}<a class="lang-switch" href="{other.path(key, extra) if indexable else other.path()}" hreflang="{other["html"]}" lang="{other["html"]}" aria-label="{esc(lang["lang_switch_label"])}">{esc(lang["lang_switch"])}</a><button class="theme-toggle" type="button" id="theme" aria-label="{esc(lang["theme"])}">{THEME_ICONS}</button></div></div>
+<div class="topbar"><span class="date">{esc(lang["today_label"])} <span id="today">{esc(lang.day(self.now.astimezone(AR).date()))}</span></span><div class="topbar-right">{self.status_line(lang)}<a class="lang-switch" href="{other.path(key, extra) if indexable else other.path()}" hreflang="{other["html"]}" lang="{other["html"]}" aria-label="{esc(lang["lang_switch_label"])}">{esc(lang["lang_switch"])}</a><button class="theme-toggle" type="button" id="theme" aria-label="{esc(lang["theme"])}">{THEME_ICONS}</button></div></div>
 <div class="masthead">
 <{brand_tag} class="brand" translate="no">{brand}</{brand_tag}>
-<p class="motto">{esc(lang["tagline"])}</p>
+<p class="motto">{esc(lang["masthead_sub"])}</p>
 </div>
 </header>
 {self.nav(lang, current)}
@@ -628,6 +708,99 @@ class Site:
             },
         }
 
+    def bars(self, rows: list[tuple[str, int]], unit: tuple[str, str]) -> str:
+        """Lista ordenada con una barra por fila. La barra es un <progress>: no necesita estilos en línea."""
+        peak = max([n for _, n in rows] + [1])
+        return '<ol class="bars">' + "".join(
+            f'<li><span class="bar-name">{esc(name)}</span><progress max="{peak}" value="{n}" aria-hidden="true"></progress>'
+            f'<span class="bar-n">{n}<span class="sr"> {esc(unit[0] if n == 1 else unit[1])}</span></span></li>'
+            for name, n in rows
+        ) + "</ol>"
+
+    def country_counts(self) -> list[tuple[str, int]]:
+        counts: Counter[str] = Counter()
+        for item in self.items:
+            text = " ".join(re.sub(r"[^a-z0-9]+", " ", norm(f'{item["title"]} {item["summary"]}')).split())
+            found = {code for code, pattern in COUNTRY_PATTERNS.items() if pattern.search(text)}
+            if item["region"] == "ar":
+                found.add("ar")
+            counts.update(found)
+        return counts.most_common()
+
+    def world_map(self, lang: Lang, counts: list[tuple[str, int]]) -> str:
+        name = 0 if lang.code == "es" else 1
+        peak = max([n for _, n in counts] + [1])
+        spots = []
+        for code, n in sorted(counts, key=lambda c: -c[1]):  # los grandes primero, así no tapan a los chicos
+            country = COUNTRIES[code]
+            x = (country[2] + 180) / 360 * MAP_W
+            y = (MAP_TOP - country[3]) / (MAP_TOP - MAP_BOTTOM) * MAP_H
+            radius = 5 + 27 * math.sqrt(n / peak)
+            unit = lang["note_count"][0 if n == 1 else 1]
+            spots.append(f'<circle class="spot" cx="{x:.0f}" cy="{y:.0f}" r="{radius:.1f}"><title>{esc(country[name])}: {n} {esc(unit)}</title></circle>')
+        top = ", ".join(f"{COUNTRIES[c][name]} ({n})" for c, n in counts[:5])
+        return (
+            f'<figure class="map"><svg viewBox="0 0 {MAP_W} {MAP_H}" role="img" aria-label="{esc(lang["map_alt"].format(top=top))}">'
+            '<defs><pattern id="halftone" width="5" height="5" patternUnits="userSpaceOnUse"><circle class="grain" cx="2.5" cy="2.5" r="1.25"/></pattern></defs>'
+            f'<path class="land" fill="url(#halftone)" d="{WORLD_LAND}"/>{"".join(spots)}</svg>'
+            f'<figcaption>{esc(lang["map_caption"])}</figcaption></figure>'
+        )
+
+    def home_data(self, lang: Lang) -> str:
+        """El radar en datos: mapa de países nombrados, temas, notas por día y tipo de fuente."""
+        name = 0 if lang.code == "es" else 1
+        counts = self.country_counts()
+        if not counts:
+            return ""
+        unit = lang["note_count"]
+        countries = [(COUNTRIES[c][name], n) for c, n in counts[:8]]
+        topics = Counter(i["category"] for i in self.items if i["category"] != "General").most_common(7)
+        kinds = source_kinds()
+        by_kind = Counter(kinds.get(i["source"], "prensa") for i in self.items)
+        trust = [(lang["trust_kinds"][k], by_kind[k]) for k in TRUST_ORDER if by_kind[k]]
+        feeds = self.latest["sources"]
+        note = lang["trust_note"].format(ok=sum(1 for f in feeds if f["ok"]), total=len(feeds))
+        return (
+            f'<section class="data" aria-labelledby="data-title">{self.block_head(lang["data_title"], "data-title")}'
+            f'<p class="block-sub">{esc(lang["data_sub"].format(n=len(self.items)))}</p>'
+            f'<div class="data-top"><div class="panel"><h3>{esc(lang["map_title"])}</h3>{self.world_map(lang, counts)}</div>'
+            f'<div class="panel"><h3>{esc(lang["rank_title"])}</h3>{self.bars(countries, unit)}</div></div>'
+            f'<div class="data-row"><div class="panel"><h3>{esc(lang["topics_title"])}</h3>'
+            f'{self.bars([(lang.category(c), n) for c, n in topics], unit)}</div>'
+            f'<div class="panel"><h3>{esc(lang["days_title"])}</h3>{pulse(lang, self.items, self.now)}</div>'
+            f'<div class="panel"><h3>{esc(lang["trust_title"])}</h3>{self.bars(trust, unit)}<p class="panel-note">{esc(note)}</p></div>'
+            '</div></section>'
+        )
+
+    def block_head(self, title: str, ident: str, link: str = "", link_text: str = "") -> str:
+        more = f'<a class="block-more" href="{link}">{esc(link_text)} »</a>' if link else ""
+        return f'<div class="block-head"><h2 id="{ident}">{esc(title)}</h2>{more}</div>'
+
+    def home_sections(self, lang: Lang, used: set[str]) -> str:
+        """Un bloque por región con sus cuatro notas más nuevas que no estén ya en la tapa."""
+        blocks = []
+        by_id = {i["id"]: i for i in self.items}
+        titles = [set(title_words(by_id[i]["title"])) for i in used if i in by_id]  # no repetir la misma noticia de otra fuente
+        for key in ("ar", "latam", "mundo"):
+            picked: list[dict] = []
+            for item in self.items:
+                words = set(title_words(item["title"]))
+                if item["region"] != key or item["id"] in used or any(same_story(words, seen) for seen in titles):
+                    continue
+                picked.append(item)
+                titles.append(words)
+                if len(picked) == 4:
+                    break
+            if len(picked) < 4:  # una fila incompleta queda coja: esa región ya tiene su columna o su sección
+                continue
+            used.update(i["id"] for i in picked)
+            blocks.append(
+                f'<section class="block" aria-labelledby="block-{key}">'
+                f'{self.block_head(lang.name(key), f"block-{key}", lang.path(key), lang["view_all"])}'
+                f'<div class="block-grid">{"".join(story(lang, i) for i in picked)}</div></section>'
+            )
+        return "".join(blocks)
+
     def more_link(self, lang: Lang) -> str:
         month = self.months[0] if self.months else ""
         if not month:
@@ -639,17 +812,20 @@ class Site:
         if not kev:
             return ""
         return (
-            f'<section class="vuln-strip" aria-labelledby="radar-title"><div class="strip-head">'
-            f'<h2 id="radar-title" class="column-title is-alert">{esc(lang["home_kev"])}</h2>'
-            f'<a class="strip-more" href="{lang.path("vulns")}">{esc(lang["home_kev_more"])} →</a></div>'
+            f'<section class="vuln-strip" aria-labelledby="radar-title">'
+            f'{self.block_head(lang["home_kev"], "radar-title", lang.path("vulns"), lang["home_kev_more"])}'
             f'<p class="strip-sub">{esc(lang["kev_sub"])}</p>{kev_table(lang, kev, compact=True)}</section>'
         )
 
     # --- Páginas ---
     def build_home(self, lang: Lang) -> None:
         front = pick_front(self.items, self.now)
-        rest = [i for i in self.items if i["id"] not in front["used"]][:RIVER_ON_HOME]
-        content = front_html(lang, front) + self.home_vulns(lang) + f'<div class="river">{river(lang, rest)}</div>' + self.more_link(lang)
+        used = set(front["used"])
+        sections = self.home_sections(lang, used)
+        rest = [i for i in self.items if i["id"] not in used][:RIVER_ON_HOME]
+        latest = (f'<section class="latest" aria-labelledby="latest-title">{self.block_head(lang["latest_title"], "latest-title")}'
+                  f'<div class="river">{river(lang, rest)}</div></section>')
+        content = front_html(lang, front) + self.home_data(lang) + sections + self.home_vulns(lang) + latest + self.more_link(lang)
         self.page(lang, "home", lang["home_title"], lang["home_description"], content,
                   extra_ld=[self.item_list(lang, lang["home_title"], self.items, lang.path())])
 

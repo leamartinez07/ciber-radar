@@ -202,8 +202,8 @@ function bind() {
   });
 }
 
-// Tema: oscuro (el de entrada) o claro. theme.js lo aplica antes de pintar. No sigue al sistema.
-const THEME_COLORS = { light: "#ffffff", dark: "#0a0a0a" };
+// Tema: claro (el de entrada) u oscuro. theme.js lo aplica antes de pintar. No sigue al sistema.
+const THEME_COLORS = { light: "#ffffff", dark: "#101010" };
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
@@ -217,7 +217,7 @@ function applyTheme(theme) {
 function bindTheme() {
   const button = $("theme");
   if (!button) return;
-  let theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  let theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
   applyTheme(theme);
   button.addEventListener("click", () => {
     theme = theme === "dark" ? "light" : "dark";

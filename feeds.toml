@@ -7,19 +7,25 @@
 # aggregator:    true marca un agregador. Las fuentes directas van antes para ganar los duplicados.
 #                De un agregador solo entran notas de los medios de [trusted].
 
+# kind dice qué tipo de fuente es: oficial (organismos), investigacion (laboratorios y autores que
+# publican hallazgos propios), especializado (medios de seguridad) o prensa (medios generales verificados).
+
 # --- Fuentes directas: Argentina y América Latina ---
 [[feeds]]
 name = "Segu-Info"
+kind = "especializado"
 url = "https://blog.segu-info.com.ar/feeds/posts/default"
 region = "latam"
 
 [[feeds]]
 name = "WeLiveSecurity (ESET)"
+kind = "investigacion"
 url = "https://www.welivesecurity.com/es/rss/feed/"
 region = "latam"
 
 [[feeds]]
 name = "Segurilatam"
+kind = "especializado"
 url = "https://www.segurilatam.com/feed"
 region = "latam"
 require_cyber = true
@@ -27,65 +33,76 @@ require_cyber = true
 # --- Fuentes directas: España ---
 [[feeds]]
 name = "Escudo Digital"
+kind = "especializado"
 url = "https://www.escudodigital.com/rss/"
 region = "mundo"
 title_prefix = "ciberseguridad | "
 
 [[feeds]]
 name = "Una al Día (Hispasec)"
+kind = "especializado"
 url = "https://unaaldia.hispasec.com/feed"
 region = "mundo"
 
 [[feeds]]
 name = "INCIBE-CERT"
+kind = "oficial"
 url = "https://www.incibe.es/incibe-cert/alerta-temprana/avisos/feed"
 region = "mundo"
 
 # --- Fuentes directas: internacional ---
 [[feeds]]
 name = "CISA"
+kind = "oficial"
 lang = "en"
 url = "https://www.cisa.gov/cybersecurity-advisories/all.xml"
 region = "mundo"
 
 [[feeds]]
 name = "BleepingComputer"
+kind = "especializado"
 lang = "en"
 url = "https://www.bleepingcomputer.com/feed/"
 region = "mundo"
 
 [[feeds]]
 name = "The Hacker News"
+kind = "especializado"
 lang = "en"
 url = "https://feeds.feedburner.com/TheHackersNews"
 region = "mundo"
 
 [[feeds]]
 name = "The Record"
+kind = "especializado"
 lang = "en"
 url = "https://therecord.media/feed/"
 region = "mundo"
 
 [[feeds]]
 name = "Krebs on Security"
+kind = "investigacion"
 lang = "en"
 url = "https://krebsonsecurity.com/feed/"
 region = "mundo"
 
 [[feeds]]
 name = "Dark Reading"
+kind = "especializado"
 lang = "en"
 url = "https://www.darkreading.com/rss.xml"
 region = "mundo"
 
 [[feeds]]
 name = "SecurityWeek"
+kind = "especializado"
 lang = "en"
 url = "https://www.securityweek.com/feed/"
 region = "mundo"
 
 [[feeds]]
 name = "Infosecurity Magazine"
+kind = "especializado"
 lang = "en"
 url = "https://www.infosecurity-magazine.com/rss/news/"
 region = "mundo"
@@ -93,24 +110,28 @@ region = "mundo"
 # --- Fuentes oficiales e investigación primaria ---
 [[feeds]]
 name = "NCSC (Reino Unido)"
+kind = "oficial"
 lang = "en"
 url = "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml"
 region = "mundo"
 
 [[feeds]]
 name = "Cisco Talos"
+kind = "investigacion"
 lang = "en"
 url = "https://blog.talosintelligence.com/rss/"
 region = "mundo"
 
 [[feeds]]
 name = "Unit 42 (Palo Alto Networks)"
+kind = "investigacion"
 lang = "en"
 url = "https://unit42.paloaltonetworks.com/feed/"
 region = "mundo"
 
 [[feeds]]
 name = "Google Project Zero"
+kind = "investigacion"
 lang = "en"
 url = "https://googleprojectzero.blogspot.com/feeds/posts/default"
 region = "mundo"
@@ -118,6 +139,7 @@ region = "mundo"
 # --- Google Noticias: medios generales (Clarín, Infobae, La Nación, TN, provinciales) ---
 [[feeds]]
 name = "Google Noticias: ciberseguridad Argentina"
+kind = "prensa"
 url = "https://news.google.com/rss/search?q=ciberseguridad+Argentina+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
 region = "mundo"
 aggregator = true
@@ -125,6 +147,7 @@ require_cyber = true
 
 [[feeds]]
 name = "Google Noticias: incidentes Argentina"
+kind = "prensa"
 url = "https://news.google.com/rss/search?q=(ciberataque+OR+hackeo+OR+ransomware+OR+%22filtraci%C3%B3n+de+datos%22)+Argentina+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
 region = "mundo"
 aggregator = true
@@ -132,6 +155,7 @@ require_cyber = true
 
 [[feeds]]
 name = "Google Noticias: ciberseguridad Latinoamérica"
+kind = "prensa"
 url = "https://news.google.com/rss/search?q=ciberseguridad+Latinoam%C3%A9rica+when:3d&hl=es-419&gl=AR&ceid=AR:es-419"
 region = "latam"
 aggregator = true
