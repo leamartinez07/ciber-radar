@@ -66,7 +66,7 @@ LANGS = {
         "home": "Portada", "front": "Portada", "alert": "Alerta", "skip": "Saltar a las noticias",
         "updated": "Actualizado", "alerts_24h": ("alerta", "alertas"), "in_24h": "en 24 h", "sources": "fuentes",
         "col_ar": "Argentina", "col_alerts": "Alertas y fallos críticos",
-        "latest_alert": "ÚLTIMA ALERTA", "activity": "Actividad", "last_alert_label": "Última alerta",
+        "latest_alert": "Última alerta", "activity": "Actividad", "last_alert_label": "Última alerta",
         "pulse_day": "{day}: {n} notas", "pulse_summary": "Notas por día en los últimos 14 días. Máximo: {peak}. Hoy: {today}.",
         "pulse_caption": "Actividad, 14 días · pico {peak}",
         "search_label": "Buscar en las noticias", "search_ph": "Buscar ransomware, CVE, bancos…",
@@ -139,7 +139,7 @@ LANGS = {
         "home": "Home", "front": "Front page", "alert": "Alert", "skip": "Skip to the news",
         "updated": "Updated", "alerts_24h": ("alert", "alerts"), "in_24h": "in 24 h", "sources": "sources",
         "col_ar": "Argentina", "col_alerts": "Alerts and critical flaws",
-        "latest_alert": "LATEST ALERT", "activity": "Activity", "last_alert_label": "Latest alert",
+        "latest_alert": "Latest alert", "activity": "Activity", "last_alert_label": "Latest alert",
         "pulse_day": "{day}: {n} stories", "pulse_summary": "Stories per day over the last 14 days. Peak: {peak}. Today: {today}.",
         "pulse_caption": "Activity, 14 days · peak {peak}",
         "search_label": "Search the news", "search_ph": "Search ransomware, CVE, banks…",
@@ -328,20 +328,25 @@ class Lang:
         return self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
 
 
+def region_chip(lang: Lang, item: dict) -> str:
+    """Ficha de color con la región: se reconoce de un vistazo de dónde es cada nota."""
+    return f'<span class="chip chip-{esc(item["region"])}">{esc(lang["regions"][item["region"]])}</span>'
+
+
 def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story") -> str:
     url = safe_url(item["url"])
     if not url:
         return ""
     item_lang = item.get("lang", "es")
     attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
-    # Tema y alerta van en la línea de datos, debajo del título: el titular no lleva etiqueta encima.
-    flag = f'<span class="flag">{esc(lang["alert"])}</span> ' if item["alert"] else ""
+    flag = f'<span class="flag">{esc(lang["alert"])}</span>' if item["alert"] else ""
+    topic = f'<span class="subject">{esc(lang.category(item["category"]))}</span> · ' if item["category"] != "General" else ""
     body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
     return (
-        f'<article class="{css}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
+        f'<article class="{css}" data-region="{esc(item["region"])}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
+        f'<p class="tags">{region_chip(lang, item)}{flag}</p>'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
-        f'{body}<p class="meta">{flag}<span class="subject">{esc(lang.topic(item))}</span> · {esc(item["source"])} · '
-        f'{lang.time_tag(item["published"])}</p></article>'
+        f'{body}<p class="meta">{topic}{esc(item["source"])} · {lang.time_tag(item["published"])}</p></article>'
     )
 
 
@@ -663,8 +668,8 @@ class Site:
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/source-serif-4-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/dm-serif-display-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>
@@ -929,9 +934,6 @@ class Site:
     def build_static(self) -> None:
         for name in ("fonts", "icons"):
             shutil.copytree(self.source / name, self.out / name)
-        if (self.source / "muestras").is_dir():  # página temporal para elegir tipografía; no entra al sitemap
-            shutil.copytree(self.source / "muestras", self.out / "muestras", ignore=shutil.ignore_patterns("*.html"))
-            shutil.copy2(self.source / "muestras" / "tipografia.html", self.out / "tipografia.html")
         for name in ("og.png", "manifest.webmanifest", "favicon.ico"):
             shutil.copy2(self.source / name, self.out / name)
         self.write("data/latest.json", json.dumps({"items": self.items}, ensure_ascii=False, separators=(",", ":")))

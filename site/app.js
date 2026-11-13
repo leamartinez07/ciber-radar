@@ -81,7 +81,11 @@ function markNew(lastVisit) {
 
 function storyNode(item) {
   const node = el("article", "story");
-  const topic = item.category === "General" ? T.regions[item.region] : (T.categories[item.category] || item.category);
+  node.dataset.region = item.region;
+  const tags = el("p", "tags");
+  tags.append(el("span", `chip chip-${item.region}`, T.regions[item.region] || item.region));
+  if (item.alert) tags.append(el("span", "flag", T.alert));
+  node.append(tags);
   const title = el("h3");
   const link = el("a", "", item.title);
   link.href = /^https?:\/\//i.test(item.url) ? item.url : "#";
@@ -93,8 +97,8 @@ function storyNode(item) {
   node.append(title);
   if (item.summary) node.append(el("p", "summary", item.summary));
   const meta = el("p", "meta");
-  if (item.alert) meta.append(el("span", "flag", T.alert), " ");
-  meta.append(el("span", "subject", topic), ` · ${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
+  if (item.category !== "General") meta.append(el("span", "subject", T.categories[item.category] || item.category), " · ");
+  meta.append(`${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
   node.append(meta);
   return node;
 }
