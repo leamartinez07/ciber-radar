@@ -203,7 +203,7 @@ function bind() {
 }
 
 // Tema: claro u oscuro. theme.js lo aplica antes de pintar; el claro es el de entrada.
-const THEME_COLORS = { light: "#14233f", dark: "#0a1426" };
+const THEME_COLORS = { light: "#1a3cff", dark: "#1a3cff" };
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;

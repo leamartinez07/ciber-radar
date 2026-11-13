@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es una R de tres líneas paralelas del mismo grosor que recorren el asta, la panza y la pata: en la panza son los anillos de un radar, con la señal detectada en el centro. Acompaña a la palabra CIBERADAR, donde la R compartida va en naranja. El dibujo es `r_mark` en `collector/render.py`. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es una R dibujada a medida, grande y al centro: la panza es el visor de un radar, con la señal detectada en el centro, y la pata es el haz que sale del visor. CIBE y ADAR la acompañan a los lados, entre dos filetes que nacen del alto de la R. El dibujo es `r_mark` en `collector/render.py`. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## Cambiar qué avisa
 
@@ -41,10 +41,10 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Archivo (Omnibus-Type, Buenos Aires) para la marca, los titulares y la interfaz: es variable en peso y ancho, y los titulares usan el corte angosto. Source Serif 4 para los resúmenes y JetBrains Mono solo para los identificadores CVE. Todas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
+Archivo (Omnibus-Type, Buenos Aires) para todo: marca, titulares, texto e interfaz. Es variable en peso y ancho: la marca usa el corte ancho y los titulares, el angosto. JetBrains Mono solo para los identificadores CVE. Ambas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
 
 ## Diseño
 
-Paleta de colores plenos, sin negro ni blanco puros: azul marino, papel cálido, naranja, amarillo y verde azulado. La cabecera va a sangre sobre azul y cierra con dos filetes, naranja y amarillo, que repiten las líneas de la R. El naranja marca alertas, el amarillo es la barra de última alerta y el verde azulado señala temas y enlaces. Esquinas rectas, sin degradados ni sombras. El tema y la marca de alerta van en la línea de datos, debajo del título. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+Azul cobalto como color de marca, amarillo para lo que se destaca y rojo anaranjado solo para alertas, sobre blanco y tinta azul muy oscura. La cabecera va a sangre sobre el azul. Las alertas se marcan con una ficha de color con la palabra, no con íconos. Esquinas rectas, sin degradados ni sombras. El tema y la ficha de alerta van en la línea de datos, debajo del título. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
 
 Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI. Para la marca se siguió el método de Allan Peters (formas geométricas simples, un mismo grosor de línea, colores plenos y cálidos, filetes derivados de la geometría del logo), sin copiar ninguna de sus piezas.

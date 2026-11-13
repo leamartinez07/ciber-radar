@@ -13,6 +13,7 @@ import email.utils
 import hashlib
 import html
 import json
+import math
 import os
 import shutil
 import sys
@@ -161,32 +162,29 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
-def r_mark(colors: tuple[str, ...] | None = None, blip: str = "", stroke: float = 8, gap: float = 4, uid: str = "cr") -> str:
-    """La R de la marca en una caja de 100 × 100: tres líneas paralelas del mismo grosor recorren el asta,
-    la panza y la pata. En la panza son los anillos de un radar, con la señal detectada en el centro.
-    Sin colores, las líneas llevan las clases s1, s2 y s3 para que las pinte la hoja de estilos."""
-    count = len(colors) if colors else 3
-    cx, cy, step = 54, 40, stroke + gap
-    first = 10 + stroke / 2
-    parts = []
-    for n in range(count):
-        x, r = first + n * step, 32 - n * step
-        paint = f'stroke="{colors[n]}"' if colors else f'class="s{n + 1}"'
-        parts.append(f'<path {paint} d="M{x:g} 96V{cy - r:g}H{cx}A{r:g} {r:g} 0 0 1 {cx} {cy + r:g}H{first + (count - 1) * step + stroke / 2 + gap:g}"/>')
-    top = cy + 32 + stroke / 2
-    legs = []
-    for n in range(count):
-        x = 50 + n * step * 1.25
-        paint = f'stroke="{colors[count - 1 - n]}"' if colors else f'class="s{count - n}"'
-        legs.append(f'<path {paint} d="M{x:g} {top - 2:g}L{x + 22:g} 98"/>')
-    dot_paint = f'fill="{blip}"' if blip else 'class="blip"'
-    radius = max(2.6, 32 - (count - 1) * step - stroke / 2 - 1.4)
-    dot = f'<circle {dot_paint} stroke="none" cx="{cx}" cy="{cy}" r="{radius:g}"/>'
-    return (f'<clipPath id="{uid}-leg"><rect x="40" y="{top:g}" width="60" height="{96 - top:g}"/></clipPath>'
-            f'<g fill="none" stroke-width="{stroke:g}">{"".join(parts)}<g clip-path="url(#{uid}-leg)">{"".join(legs)}</g>{dot}</g>')
+R_WIDTH = 112  # ancho de la R en una caja de alto 100
 
 
-EMBLEM = f'<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">{r_mark()}</svg>'
+def r_mark(body: str = "", dot: str = "") -> str:
+    """La R de la marca, dibujada a medida: la panza es el visor de un radar, con la señal detectada
+    en el centro, y la pata es el haz que sale del visor y se abre hasta la base.
+    Sin colores, las piezas llevan las clases r-body y r-dot para que las pinte la hoja de estilos."""
+    cx, cy, outer, hole = 56, 34, 34, 17
+    def at(angle: float, radius: float) -> tuple[float, float]:
+        return cx + radius * math.cos(math.radians(angle)), cy + radius * math.sin(math.radians(angle))
+    def foot(angle: float) -> float:
+        return cx + (100 - cy) / math.tan(math.radians(angle))
+    (ax, ay), (bx, by) = at(80, outer - 6), at(50, outer - 6)
+    shape = (f"M0 0H{cx}A{outer} {outer} 0 0 1 {cx} {2 * outer}H26V100H0Z"
+             f"M{cx - hole} {cy}A{hole} {hole} 0 1 0 {cx + hole} {cy}A{hole} {hole} 0 1 0 {cx - hole} {cy}Z")
+    beam = f"M{ax:.1f} {ay:.1f}L{bx:.1f} {by:.1f}L{foot(50):.1f} 100L{foot(80):.1f} 100Z"
+    paint = f'fill="{body}"' if body else 'class="r-body"'
+    dot_paint = f'fill="{dot}"' if dot else 'class="r-dot"'
+    return (f'<path {paint} fill-rule="evenodd" d="{shape}"/><path {paint} d="{beam}"/>'
+            f'<circle {dot_paint} cx="{cx}" cy="{cy}" r="6"/>')
+
+
+EMBLEM = f'<svg class="emblem" viewBox="0 0 {R_WIDTH} 100" aria-hidden="true" focusable="false">{r_mark()}</svg>'
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
@@ -502,7 +500,7 @@ class Site:
         attr = f' lang="{esc(latest.get("lang", "es"))}"' if latest.get("lang", "es") != lang.code else ""
         return (
             f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}">'
-            f'<div class="wire-news"><span class="wire-label"><span class="pulse" aria-hidden="true"></span>{esc(lang["latest_alert"])}</span>'
+            f'<div class="wire-news"><span class="wire-label">{esc(lang["latest_alert"])}</span>'
             f'<a{attr} href="{esc(safe_url(latest["url"]))}" target="_blank" rel="noopener noreferrer">{esc(latest["title"])}</a>'
             f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></div>{chart}</aside>'
         )
@@ -559,7 +557,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="word">Cibe<b>r</b>adar</span></a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}"><span class="side">Cibe</span>{EMBLEM}<span class="sr">r</span><span class="side">adar</span></a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}
@@ -583,7 +581,7 @@ class Site:
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{esc(canonical)}">
 {hreflang if indexable else ""}
-<meta name="theme-color" content="#14233f">
+<meta name="theme-color" content="#1a3cff">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
 <meta property="og:type" content="website">

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Genera la marca de Ciber Radar desde un solo dibujo: íconos de la app, favicon e imagen para redes.
 
-El emblema es una R de tres líneas paralelas del mismo grosor: recorren el asta, la panza y la pata.
-En la panza son los anillos de un radar, con la señal detectada en el centro. El dibujo vive en
-collector/render.py (r_mark) y es el mismo de la cabecera del sitio.
+El emblema es una R dibujada a medida: la panza es el visor de un radar, con la señal detectada en
+el centro, y la pata es el haz que sale del visor. En la marca completa va grande y al centro, con
+CIBE y ADAR a los lados entre dos filetes. El dibujo vive en collector/render.py (r_mark).
 
 Herramienta de desarrollo: usa Playwright con Chromium para pasar el SVG a PNG.
     PLAYWRIGHT_BROWSERS_PATH=… python tools/make_brand.py
@@ -20,22 +20,19 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 ICONS = SITE / "icons"
 sys.path.insert(0, str(ROOT / "collector"))
-from render import r_mark  # noqa: E402
+from render import R_WIDTH, r_mark  # noqa: E402
 
-NAVY, PAPER, ORANGE, YELLOW, MUTED = "#14233f", "#f3ead7", "#e2491f", "#f2b632", "#a9b4c8"
-LINES = (ORANGE, YELLOW, PAPER)
-
-
-def mark(size: float, cx: float, cy: float, small: bool = False) -> str:
-    """La R en un cuadrado de lado size con centro en (cx, cy). En chico lleva dos líneas más gruesas."""
-    art = r_mark((ORANGE, PAPER), ORANGE, stroke=12, gap=6, uid="s") if small else r_mark(LINES, ORANGE, uid="m")
-    return f'<svg x="{cx - size / 2:.1f}" y="{cy - size / 2:.1f}" width="{size:.1f}" height="{size:.1f}" viewBox="0 0 100 100">{art}</svg>'
+BLUE, WHITE, YELLOW, SOFT = "#1a3cff", "#ffffff", "#ffe14d", "#d5dcff"
 
 
 def icon_svg(rounded: bool, scale: float = 1.0, small: bool = False) -> str:
+    """La R blanca con la señal amarilla sobre el azul de marca."""
     corner = ' rx="112"' if rounded else ""
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
-            f'<rect width="512" height="512"{corner} fill="{NAVY}"/>{mark((400 if small else 340) * scale, 262, 256, small)}</svg>')
+    height = (360 if small else 300) * scale
+    width = height * R_WIDTH / 100
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512"{corner} fill="{BLUE}"/>'
+            f'<svg x="{256 - width / 2 + height * .03:.1f}" y="{256 - height / 2:.1f}" width="{width:.1f}" height="{height:.1f}" '
+            f'viewBox="0 0 {R_WIDTH} 100">{r_mark(WHITE, YELLOW)}</svg></svg>')
 
 
 def og_html() -> str:
@@ -43,18 +40,17 @@ def og_html() -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face {{ font-family: "Archivo"; src: url("{fonts}/archivo-latin-wdth-normal.woff2"); font-weight: 100 900; font-stretch: 62% 125%; }}
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
-body {{ display: grid; place-items: center; background: {NAVY}; color: {PAPER}; font-family: "Archivo"; }}
-.wrap {{ display: flex; flex-direction: column; align-items: center; margin-top: -14px; }}
-h1 {{ display: flex; align-items: center; gap: .2em; margin: 0; font-weight: 850; font-stretch: 108%; font-size: 116px; line-height: 1; letter-spacing: .01em; }}
-h1 svg {{ width: 1.02em; height: 1.02em; }}
-h1 b {{ color: {ORANGE}; }}
-p {{ margin: 34px 0 0; font: 500 31px/1.2 "Archivo"; }}
-small {{ margin-top: 22px; font: 700 19px/1 "Archivo"; letter-spacing: .2em; color: {MUTED}; }}
-.rule {{ position: absolute; left: 0; right: 0; bottom: 0; height: 28px; background: linear-gradient({ORANGE} 50%, {YELLOW} 50%); }}
+body {{ display: grid; place-items: center; background: {BLUE}; color: {WHITE}; font-family: "Archivo"; }}
+.wrap {{ display: flex; flex-direction: column; align-items: center; }}
+h1 {{ display: flex; align-items: stretch; gap: .22em; margin: 0; font-weight: 900; font-stretch: 118%; font-size: 92px; line-height: 1; letter-spacing: .04em; }}
+h1 span {{ display: flex; align-items: center; padding: 0 .1em; border-block: .09em solid; }}
+h1 svg {{ width: auto; height: 2.1em; }}
+p {{ margin: 44px 0 0; font: 600 32px/1.2 "Archivo"; }}
+small {{ margin-top: 22px; font: 700 19px/1 "Archivo"; letter-spacing: .2em; color: {SOFT}; }}
 </style></head><body>
-<div class="wrap"><h1><svg viewBox="0 0 100 100">{r_mark(LINES, ORANGE, uid="o")}</svg><span>CIBE<b>R</b>ADAR</span></h1>
+<div class="wrap"><h1><span>CIBE</span><svg viewBox="0 0 {R_WIDTH} 100">{r_mark(WHITE, YELLOW)}</svg><span>ADAR</span></h1>
 <p>Toda la ciberseguridad, a medida que sale.</p>
-<small>ARGENTINA · LATAM · WORLD</small></div><div class="rule"></div></body></html>'''
+<small>ARGENTINA · LATAM · WORLD</small></div></body></html>'''
 
 
 def ico(png: bytes, size: int) -> bytes:
