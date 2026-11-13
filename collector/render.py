@@ -56,6 +56,8 @@ LANGS = {
         "map_title": "Dónde pasa", "map_alt": "Mapa del mundo con un círculo por país mencionado. Los más nombrados: {top}.",
         "map_caption": "Países nombrados en titulares y resúmenes. El círculo crece con la cantidad de notas.",
         "rank_title": "Países más nombrados", "topics_title": "De qué se habla", "days_title": "Notas por día",
+        "map_modes": "Qué contar", "map_all": "Todas las notas", "map_alerts": "Solo alertas",
+        "map_pick": "Tocá un país en el mapa o en la lista para ver sus notas.", "country_news": "{name}: {n} {unit}",
         "trust_title": "De dónde viene la información",
         "trust_kinds": {"oficial": "Organismos oficiales", "investigacion": "Investigación propia",
                         "especializado": "Medios especializados", "prensa": "Prensa general verificada"},
@@ -66,7 +68,7 @@ LANGS = {
         "home": "Portada", "front": "Portada", "alert": "Alerta", "skip": "Saltar a las noticias",
         "updated": "Actualizado", "alerts_24h": ("alerta", "alertas"), "in_24h": "en 24 h", "sources": "fuentes",
         "col_ar": "Argentina", "col_alerts": "Alertas y fallos críticos",
-        "latest_alert": "Última alerta", "activity": "Actividad", "last_alert_label": "Última alerta",
+        "latest_alert": "ÚLTIMA ALERTA", "activity": "Actividad", "last_alert_label": "Última alerta",
         "pulse_day": "{day}: {n} notas", "pulse_summary": "Notas por día en los últimos 14 días. Máximo: {peak}. Hoy: {today}.",
         "pulse_caption": "Actividad, 14 días · pico {peak}",
         "search_label": "Buscar en las noticias", "search_ph": "Buscar ransomware, CVE, bancos…",
@@ -129,6 +131,8 @@ LANGS = {
         "map_title": "Where it happens", "map_alt": "World map with one circle per country mentioned. Most named: {top}.",
         "map_caption": "Countries named in headlines and summaries. The circle grows with the number of stories.",
         "rank_title": "Most named countries", "topics_title": "What is being covered", "days_title": "Stories per day",
+        "map_modes": "What to count", "map_all": "All stories", "map_alerts": "Alerts only",
+        "map_pick": "Tap a country on the map or in the list to see its stories.", "country_news": "{name}: {n} {unit}",
         "trust_title": "Where the information comes from",
         "trust_kinds": {"oficial": "Official bodies", "investigacion": "Original research",
                         "especializado": "Specialist outlets", "prensa": "Verified general press"},
@@ -139,7 +143,7 @@ LANGS = {
         "home": "Home", "front": "Front page", "alert": "Alert", "skip": "Skip to the news",
         "updated": "Updated", "alerts_24h": ("alert", "alerts"), "in_24h": "in 24 h", "sources": "sources",
         "col_ar": "Argentina", "col_alerts": "Alerts and critical flaws",
-        "latest_alert": "Latest alert", "activity": "Activity", "last_alert_label": "Latest alert",
+        "latest_alert": "LATEST ALERT", "activity": "Activity", "last_alert_label": "Latest alert",
         "pulse_day": "{day}: {n} stories", "pulse_summary": "Stories per day over the last 14 days. Peak: {peak}. Today: {today}.",
         "pulse_caption": "Activity, 14 days · peak {peak}",
         "search_label": "Search the news", "search_ph": "Search ransomware, CVE, banks…",
@@ -328,26 +332,21 @@ class Lang:
         return self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
 
 
-def region_chip(lang: Lang, item: dict) -> str:
-    """Ficha de color con la región: se reconoce de un vistazo de dónde es cada nota."""
-    return f'<span class="chip chip-{esc(item["region"])}">{esc(lang["regions"][item["region"]])}</span>'
-
-
 def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story", flag: bool = True) -> str:
     url = safe_url(item["url"])
     if not url:
         return ""
     item_lang = item.get("lang", "es")
     attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
+    # Tema y alerta van en la línea de datos, debajo del título: el titular no lleva etiqueta encima.
     # En la columna de alertas la marca sobra: ahí todas lo son.
-    mark = f'<span class="flag">{esc(lang["alert"])}</span>' if item["alert"] and flag else ""
-    topic = f'<span class="subject">{esc(lang.category(item["category"]))}</span> · ' if item["category"] != "General" else ""
+    mark = f'<span class="flag">{esc(lang["alert"])}</span> ' if item["alert"] and flag else ""
     body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
     return (
-        f'<article class="{css}" data-region="{esc(item["region"])}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
-        f'<p class="tags">{region_chip(lang, item)}{mark}</p>'
+        f'<article class="{css}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
-        f'{body}<p class="meta">{topic}{esc(item["source"])} <span class="when">· {lang.time_tag(item["published"])}</span></p></article>'
+        f'{body}<p class="meta">{mark}<span class="subject">{esc(lang.topic(item))}</span> · {esc(item["source"])} '
+        f'<span class="when">· {lang.time_tag(item["published"])}</span></p></article>'
     )
 
 
@@ -669,8 +668,7 @@ class Site:
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preload" href="/fonts/mona-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/hubot-sans-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>
@@ -725,43 +723,95 @@ class Site:
             for name, n in rows
         ) + "</ol>"
 
-    def country_counts(self) -> list[tuple[str, int]]:
-        counts: Counter[str] = Counter()
+    def country_items(self) -> dict[str, list[dict]]:
+        """Notas que nombran a cada país, de la más nueva a la más vieja."""
+        found: dict[str, list[dict]] = {}
         for item in self.items:
             text = " ".join(re.sub(r"[^a-z0-9]+", " ", norm(f'{item["title"]} {item["summary"]}')).split())
-            found = {code for code, pattern in COUNTRY_PATTERNS.items() if pattern.search(text)}
+            codes = {code for code, pattern in COUNTRY_PATTERNS.items() if pattern.search(text)}
             if item["region"] == "ar":
-                found.add("ar")
-            counts.update(found)
-        return counts.most_common()
+                codes.add("ar")
+            for code in codes:
+                found.setdefault(code, []).append(item)
+        return found
 
-    def world_map(self, lang: Lang, counts: list[tuple[str, int]]) -> str:
+    def country_counts(self) -> list[tuple[str, int]]:
+        return sorted(((c, len(v)) for c, v in self.country_items().items()), key=lambda c: (-c[1], c[0]))
+
+    def map_layer(self, lang: Lang, layer: str, counts: list[tuple[str, int]]) -> str:
+        """Un círculo por país; crece con la cantidad de notas. Los grandes van primero para no tapar a los chicos."""
         name = 0 if lang.code == "es" else 1
         peak = max([n for _, n in counts] + [1])
         spots = []
-        for code, n in sorted(counts, key=lambda c: -c[1]):  # los grandes primero, así no tapan a los chicos
+        for code, n in counts:
             country = COUNTRIES[code]
             x = (country[2] + 180) / 360 * MAP_W
             y = (MAP_TOP - country[3]) / (MAP_TOP - MAP_BOTTOM) * MAP_H
             radius = 5 + 27 * math.sqrt(n / peak)
-            unit = lang["note_count"][0 if n == 1 else 1]
-            spots.append(f'<circle class="spot" cx="{x:.0f}" cy="{y:.0f}" r="{radius:.1f}"><title>{esc(country[name])}: {n} {esc(unit)}</title></circle>')
-        top = ", ".join(f"{COUNTRIES[c][name]} ({n})" for c, n in counts[:5])
-        return (
-            f'<figure class="map"><svg viewBox="0 0 {MAP_W} {MAP_H}" role="img" aria-label="{esc(lang["map_alt"].format(top=top))}">'
-            '<defs><pattern id="halftone" width="5" height="5" patternUnits="userSpaceOnUse"><circle class="grain" cx="2.5" cy="2.5" r="1.25"/></pattern></defs>'
-            f'<path class="land" fill="url(#halftone)" d="{WORLD_LAND}"/>{"".join(spots)}</svg>'
-            f'<figcaption>{esc(lang["map_caption"])}</figcaption></figure>'
+            label = f'{country[name]}: {n} {lang["note_count"][0 if n == 1 else 1]}'
+            spots.append(f'<circle class="spot" data-c="{code}" data-label="{esc(label)}" cx="{x:.0f}" cy="{y:.0f}" r="{radius:.1f}">'
+                         f'<title>{esc(label)}</title></circle>')
+        return f'<g data-layer="{layer}">{"".join(spots)}</g>'
+
+    def country_list(self, lang: Lang, layer: str, counts: list[tuple[str, int]]) -> str:
+        """Ranking de países: cada fila es un botón que muestra sus notas."""
+        name = 0 if lang.code == "es" else 1
+        peak = max([n for _, n in counts] + [1])
+        rows = "".join(
+            f'<li><button class="bar-name country-pick" type="button" data-c="{code}" aria-pressed="false">{esc(COUNTRIES[code][name])}</button>'
+            f'<progress max="{peak}" value="{n}" aria-hidden="true"></progress>'
+            f'<span class="bar-n">{n}<span class="sr"> {esc(lang["note_count"][0 if n == 1 else 1])}</span></span></li>'
+            for code, n in counts[:8]
         )
+        return f'<ol class="bars" data-layer="{layer}">{rows}</ol>'
+
+    def country_news(self, lang: Lang, layer: str, found: dict[str, list[dict]], counts: list[tuple[str, int]], show_first: bool) -> str:
+        name = 0 if lang.code == "es" else 1
+        panels = []
+        for index, (code, n) in enumerate(counts[:12]):
+            items = found[code][:5]
+            heading = lang["country_news"].format(name=COUNTRIES[code][name], n=n, unit=lang["note_count"][0 if n == 1 else 1])
+            rows = "".join(
+                f'<li><a href="{esc(safe_url(i["url"]))}" target="_blank" rel="noopener noreferrer"'
+                f'{f' lang="{esc(i.get("lang", "es"))}"' if i.get("lang", "es") != lang.code else ""}>{esc(i["title"])}</a>'
+                f'<span class="meta">{esc(i["source"])} <span class="when">· {lang.time_tag(i["published"])}</span></span></li>'
+                for i in items
+            )
+            hidden = "" if (show_first and index == 0) else " hidden"
+            panels.append(f'<section class="country" data-layer="{layer}" data-c="{code}"{hidden}><h4>{esc(heading)}</h4><ul>{rows}</ul></section>')
+        return "".join(panels)
+
+    def world_map(self, lang: Lang) -> str:
+        """Mapa interactivo: alterna todas las notas o solo alertas; un país elegido muestra sus notas."""
+        name = 0 if lang.code == "es" else 1
+        found = self.country_items()
+        alerts = {c: [i for i in v if i["alert"]] for c, v in found.items()}
+        alerts = {c: v for c, v in alerts.items() if v}
+        order = lambda d: sorted(((c, len(v)) for c, v in d.items()), key=lambda c: (-c[1], c[0]))  # noqa: E731
+        all_counts, alert_counts = order(found), order(alerts)
+        top = ", ".join(f"{COUNTRIES[c][name]} ({n})" for c, n in all_counts[:5])
+        modes = (f'<div class="map-modes" role="group" aria-label="{esc(lang["map_modes"])}">'
+                 f'<button type="button" data-mode="all" aria-pressed="true">{esc(lang["map_all"])}</button>'
+                 f'<button type="button" data-mode="alert" aria-pressed="false">{esc(lang["map_alerts"])}</button></div>')
+        svg = (f'<svg viewBox="0 0 {MAP_W} {MAP_H}" role="img" aria-label="{esc(lang["map_alt"].format(top=top))}">'
+               '<defs><pattern id="halftone" width="5" height="5" patternUnits="userSpaceOnUse"><circle class="grain" cx="2.5" cy="2.5" r="1.25"/></pattern></defs>'
+               f'<path class="land" fill="url(#halftone)" d="{WORLD_LAND}"/>'
+               f'{self.map_layer(lang, "all", all_counts)}{self.map_layer(lang, "alert", alert_counts)}</svg>')
+        news = self.country_news(lang, "all", found, all_counts, True) + self.country_news(lang, "alert", alerts, alert_counts, False)
+        return (
+            f'<div class="map-head"><h3>{esc(lang["map_title"])}</h3>{modes}</div>'
+            f'<figure class="map">{svg}<div class="map-tip" hidden></div>'
+            f'<figcaption>{esc(lang["map_caption"])} {esc(lang["map_pick"])}</figcaption></figure>'
+            f'<div class="country-news" aria-live="polite">{news}</div>'
+        ), self.country_list(lang, "all", all_counts) + self.country_list(lang, "alert", alert_counts)
 
     def home_data(self, lang: Lang) -> str:
         """El radar en datos: mapa de países nombrados, temas, notas por día y tipo de fuente."""
         name = 0 if lang.code == "es" else 1
-        counts = self.country_counts()
-        if not counts:
+        if not self.country_items():
             return ""
         unit = lang["note_count"]
-        countries = [(COUNTRIES[c][name], n) for c, n in counts[:8]]
+        map_html, ranking = self.world_map(lang)
         topics = Counter(i["category"] for i in self.items if i["category"] != "General").most_common(7)
         kinds = source_kinds()
         by_kind = Counter(kinds.get(i["source"], "prensa") for i in self.items)
@@ -771,8 +821,8 @@ class Site:
         return (
             f'<section class="data" aria-labelledby="data-title">{self.block_head(lang["data_title"], "data-title")}'
             f'<p class="block-sub">{esc(lang["data_sub"].format(n=len(self.items)))}</p>'
-            f'<div class="data-top"><div class="panel"><h3>{esc(lang["map_title"])}</h3>{self.world_map(lang, counts)}</div>'
-            f'<div class="panel"><h3>{esc(lang["rank_title"])}</h3>{self.bars(countries, unit)}</div></div>'
+            f'<div class="data-top" data-mode="all"><div class="panel">{map_html}</div>'
+            f'<div class="panel"><h3>{esc(lang["rank_title"])}</h3>{ranking}</div></div>'
             f'<div class="data-row"><div class="panel"><h3>{esc(lang["topics_title"])}</h3>'
             f'{self.bars([(lang.category(c), n) for c, n in topics], unit)}</div>'
             f'<div class="panel"><h3>{esc(lang["days_title"])}</h3>{pulse(lang, self.items, self.now)}</div>'

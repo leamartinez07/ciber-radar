@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es tipográfica: las dos R del medio van espalda con espalda, en rojo y en Hubot Sans 900 (la de CIBER va espejada). Su mayúscula mide exactamente lo mismo que CIBE y ADAR, de filete a filete; las medidas están explicadas en `site/styles.css`. CIBE y ADAR van en Mona Sans entre dos filetes. Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es tipográfica, como la cabecera de un diario: CIBE y ADAR en Archivo angosta entre dos filetes, y en el medio las dos R espalda con espalda, en rojo, con la misma letra, tamaño y peso (la de CIBER va espejada). Los íconos llevan solo las dos R. `tools/make_brand.py` genera el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## El radar en datos
 
@@ -51,10 +51,10 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Las dos familias de GitHub, diseñadas con Degarism Studio: Mona Sans (variable, de 200 a 900) para todo el sitio y Hubot Sans 900 solo para las dos R de la marca. JetBrains Mono solo para los identificadores CVE. Todas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Vienen de fontsource, versión 5.3.0.
+Una sola familia, Archivo (Omnibus-Type, Buenos Aires), variable en peso y ancho: angosta para la marca, el menú y los titulares, y de ancho normal para el texto, sin contraste de finos y gruesos. JetBrains Mono solo para los identificadores CVE. Licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
 
 ## Diseño
 
-Diario de lectura cómoda: hasta 1520 px de ancho, texto de 18 px con interlineado amplio, menú y rótulos en minúscula normal. Cada nota lleva arriba del título su región en texto de color: Argentina naranja, Latinoamérica verde y Mundo violeta, los tonos de Primer, el sistema de diseño de GitHub, en versión clara y oscura. Hay un solo rojo, el de la barra de última alerta, que repiten la marca, la franja de la columna de alertas y la palabra «Alerta». En el tema oscuro el texto baja un poco de peso y se abre apenas, porque el texto claro sobre fondo oscuro se ve más grueso. El selector de temas usa el desplegable personalizable del navegador; donde no existe, queda el nativo. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
+Diario clásico en blanco y negro, hasta 1520 px de ancho: filetes verticales entre columnas, bloques por región con título grande y un solo rojo, el de la barra de última alerta, para la marca y las alertas. El mapa de «El radar en datos» es interactivo: alterna todas las notas o solo alertas, y al tocar un país (en el mapa o en la lista) muestra sus últimas notas. El selector de temas usa el desplegable personalizable del navegador; donde no existe, queda el nativo. Hay tema claro (el de entrada) y oscuro, que se elige con el botón; en el oscuro cada peso baja un escalón, porque el texto claro sobre negro se ve más grueso. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
 
-Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: degradados violeta y celeste, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI.
+Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI.

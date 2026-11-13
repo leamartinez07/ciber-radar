@@ -81,11 +81,7 @@ function markNew(lastVisit) {
 
 function storyNode(item) {
   const node = el("article", "story");
-  node.dataset.region = item.region;
-  const tags = el("p", "tags");
-  tags.append(el("span", `chip chip-${item.region}`, T.regions[item.region] || item.region));
-  if (item.alert) tags.append(el("span", "flag", T.alert));
-  node.append(tags);
+  const topic = item.category === "General" ? T.regions[item.region] : (T.categories[item.category] || item.category);
   const title = el("h3");
   const link = el("a", "", item.title);
   link.href = /^https?:\/\//i.test(item.url) ? item.url : "#";
@@ -97,8 +93,8 @@ function storyNode(item) {
   node.append(title);
   if (item.summary) node.append(el("p", "summary", item.summary));
   const meta = el("p", "meta");
-  if (item.category !== "General") meta.append(el("span", "subject", T.categories[item.category] || item.category), " · ");
-  meta.append(`${item.source} `, el("span", "when", `· ${relative(item.published) || shortDate.format(new Date(item.published))}`));
+  if (item.alert) meta.append(el("span", "flag", T.alert), " ");
+  meta.append(el("span", "subject", topic), ` · ${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
   node.append(meta);
   return node;
 }
@@ -249,6 +245,46 @@ function revealCurrentSection() {
   nav.scrollLeft = current.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2;
 }
 
+// Mapa: alterna todas las notas o solo alertas; un país elegido en el mapa o en la lista muestra sus notas.
+function bindMap() {
+  const box = document.querySelector(".data-top");
+  const map = box?.querySelector(".map");
+  if (!map) return;
+  const tip = map.querySelector(".map-tip");
+  let mode = "all";
+  let code = box.querySelector('.country[data-layer="all"]:not([hidden])')?.dataset.c || "";
+  const render = () => {
+    box.dataset.mode = mode;
+    box.querySelectorAll(".map-modes button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+    if (!box.querySelector(`.country[data-layer="${mode}"][data-c="${code}"]`)) {
+      code = box.querySelector(`.country[data-layer="${mode}"]`)?.dataset.c || "";
+    }
+    box.querySelectorAll(".country").forEach((panel) => { panel.hidden = !(panel.dataset.layer === mode && panel.dataset.c === code); });
+    box.querySelectorAll(".spot").forEach((spot) => spot.classList.toggle("is-on", spot.dataset.c === code));
+    box.querySelectorAll(".country-pick").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.c === code && button.closest("[data-layer]").dataset.layer === mode));
+    });
+    map.classList.toggle("has-pick", Boolean(code));
+  };
+  box.addEventListener("click", (event) => {
+    const modeButton = event.target.closest(".map-modes button");
+    if (modeButton) { mode = modeButton.dataset.mode; render(); return; }
+    const pick = event.target.closest(".spot, .country-pick");
+    if (pick) { code = pick.dataset.c; render(); }
+  });
+  map.addEventListener("pointermove", (event) => {
+    const spot = event.target.closest?.(".spot");
+    if (!spot) { tip.hidden = true; return; }
+    const area = map.getBoundingClientRect();
+    tip.textContent = spot.dataset.label;
+    tip.style.left = `${event.clientX - area.left}px`;
+    tip.style.top = `${event.clientY - area.top}px`;
+    tip.hidden = false;
+  });
+  map.addEventListener("pointerleave", () => { tip.hidden = true; });
+  render();
+}
+
 function start() {
   markNew(storageGet("ciber-radar:last-visit"));
   storageSet("ciber-radar:last-visit", new Date().toISOString().slice(0, 19) + "+00:00");
@@ -256,6 +292,7 @@ function start() {
   refreshDays();
   bind();
   bindTheme();
+  bindMap();
   revealCurrentSection();
   registerWorker();
 }
