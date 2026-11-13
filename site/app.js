@@ -11,12 +11,12 @@ const T = EN ? {
     Vulnerabilidades: "Vulnerabilities", "Estado y defensa": "Government & defense" },
   now: "just now", minutes: (n) => `${n} min ago`, hours: (n) => `${n} h ago`, today: "Today", yesterday: "Yesterday",
   fresh: "NEW", offline: "Search failed. Check your connection.", results: (n) => (n === 1 ? "1 result" : `${n} results`), within: " in ",
-  themes: { auto: "automatic", light: "light", dark: "dark" }, theme: "Theme", switchTo: "Switch to",
+  themes: { light: "light", dark: "dark" }, theme: "Theme", switchTo: "Switch to",
 } : {
   locale: "es-AR", regions: { ar: "Argentina", latam: "Latinoamérica", mundo: "Mundo" }, alert: "Alerta", categories: {},
   now: "recién", minutes: (n) => `hace ${n} min`, hours: (n) => `hace ${n} h`, today: "Hoy", yesterday: "Ayer",
   fresh: "NUEVO", offline: "No se pudo buscar. Revisá la conexión.", results: (n) => (n === 1 ? "1 resultado" : `${n} resultados`), within: " en ",
-  themes: { auto: "automático", light: "claro", dark: "oscuro" }, theme: "Tema", switchTo: "Cambiar a",
+  themes: { light: "claro", dark: "oscuro" }, theme: "Tema", switchTo: "Cambiar a",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -202,19 +202,13 @@ function bind() {
   });
 }
 
-// Tema: automático (sigue al sistema), claro u oscuro. theme.js lo aplica antes de pintar.
-const THEMES = ["auto", "light", "dark"];
-const THEME_COLORS = { light: "#ffffff", dark: "#0a0a0a" };
+// Tema: claro u oscuro. theme.js lo aplica antes de pintar; el claro es el de entrada.
+const THEME_COLORS = { light: "#14233f", dark: "#0a1426" };
 
 function applyTheme(theme) {
-  const root = document.documentElement;
-  if (theme === "auto") delete root.dataset.theme;
-  else root.dataset.theme = theme;
-  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-    const scheme = meta.media.includes("dark") ? "dark" : "light";
-    meta.content = THEME_COLORS[theme === "auto" ? scheme : theme];
-  });
-  const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+  document.documentElement.dataset.theme = theme;
+  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => { meta.content = THEME_COLORS[theme]; });
+  const next = theme === "dark" ? "light" : "dark";
   const button = $("theme");
   button.setAttribute("aria-label", `${T.theme}: ${T.themes[theme]}. ${T.switchTo} ${T.themes[next]}`);
   button.title = `${T.theme}: ${T.themes[theme]}`;
@@ -223,16 +217,12 @@ function applyTheme(theme) {
 function bindTheme() {
   const button = $("theme");
   if (!button) return;
-  let theme = document.documentElement.dataset.theme || "auto";
+  let theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
   applyTheme(theme);
   button.addEventListener("click", () => {
-    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    theme = theme === "dark" ? "light" : "dark";
     applyTheme(theme);
-    if (theme === "auto") {
-      try { localStorage.removeItem("ciber-radar:theme"); } catch { /* sin almacenamiento */ }
-    } else {
-      storageSet("ciber-radar:theme", theme);
-    }
+    storageSet("ciber-radar:theme", theme);
   });
 }
 
@@ -267,8 +257,3 @@ function start() {
 }
 
 start();
-
-const brandNode = document.querySelector(".brand");
-if (brandNode && "IntersectionObserver" in window) {
-  new IntersectionObserver(([entry]) => brandNode.classList.toggle("is-idle", !entry.isIntersecting)).observe(brandNode);
-}

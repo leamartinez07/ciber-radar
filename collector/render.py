@@ -161,15 +161,32 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
-# La R que une CIBE y ADAR: la panza es la pantalla del radar (hueco, punto y barrido) y la pata
-# son las ondas que emite. Un solo color. tools/make_brand.py dibuja la misma letra.
-EMBLEM = (
-    '<svg class="emblem" viewBox="0 0 102 100" aria-hidden="true" focusable="false">'
-    '<clipPath id="cr-leg"><rect x="30" y="0" width="72" height="100"/></clipPath>'
-    '<path fill-rule="evenodd" d="M0 0H55A31 31 0 0 1 55 62H22V100H0ZM35 31A20 20 0 1 0 75 31A20 20 0 1 0 35 31Z"/>'
-    '<path class="sweep" d="M55 31L55 11A20 20 0 0 1 75 31Z"/><circle cx="55" cy="31" r="6"/>'
-    '<g class="waves" clip-path="url(#cr-leg)"><path d="M85.9 60.9A43 43 0 0 1 50.5 73.8"/><path d="M97.4 72.0A59 59 0 0 1 48.8 89.7"/><path d="M109.0 83.1A75 75 0 0 1 47.2 105.6"/></g></svg>'
-)
+def r_mark(colors: tuple[str, ...] | None = None, blip: str = "", stroke: float = 8, gap: float = 4, uid: str = "cr") -> str:
+    """La R de la marca en una caja de 100 × 100: tres líneas paralelas del mismo grosor recorren el asta,
+    la panza y la pata. En la panza son los anillos de un radar, con la señal detectada en el centro.
+    Sin colores, las líneas llevan las clases s1, s2 y s3 para que las pinte la hoja de estilos."""
+    count = len(colors) if colors else 3
+    cx, cy, step = 54, 40, stroke + gap
+    first = 10 + stroke / 2
+    parts = []
+    for n in range(count):
+        x, r = first + n * step, 32 - n * step
+        paint = f'stroke="{colors[n]}"' if colors else f'class="s{n + 1}"'
+        parts.append(f'<path {paint} d="M{x:g} 96V{cy - r:g}H{cx}A{r:g} {r:g} 0 0 1 {cx} {cy + r:g}H{first + (count - 1) * step + stroke / 2 + gap:g}"/>')
+    top = cy + 32 + stroke / 2
+    legs = []
+    for n in range(count):
+        x = 50 + n * step * 1.25
+        paint = f'stroke="{colors[count - 1 - n]}"' if colors else f'class="s{count - n}"'
+        legs.append(f'<path {paint} d="M{x:g} {top - 2:g}L{x + 22:g} 98"/>')
+    dot_paint = f'fill="{blip}"' if blip else 'class="blip"'
+    radius = max(2.6, 32 - (count - 1) * step - stroke / 2 - 1.4)
+    dot = f'<circle {dot_paint} stroke="none" cx="{cx}" cy="{cy}" r="{radius:g}"/>'
+    return (f'<clipPath id="{uid}-leg"><rect x="40" y="{top:g}" width="60" height="{96 - top:g}"/></clipPath>'
+            f'<g fill="none" stroke-width="{stroke:g}">{"".join(parts)}<g clip-path="url(#{uid}-leg)">{"".join(legs)}</g>{dot}</g>')
+
+
+EMBLEM = f'<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">{r_mark()}</svg>'
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
@@ -178,7 +195,6 @@ BRAND_MARK = (
     '<path class="lm-bar" d="M40 142H128V170H40Z"/></g></svg>'
 )
 THEME_ICONS = (
-    '<svg class="i-auto" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor"/></svg>'
     '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/>'
     '<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
     '<svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>'
@@ -543,7 +559,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}"><span class="thin">Cibe</span>{EMBLEM}<span class="sr">r</span>adar</a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="word">Cibe<b>r</b>adar</span></a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}
@@ -567,8 +583,7 @@ class Site:
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{esc(canonical)}">
 {hreflang if indexable else ""}
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#14233f">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
 <meta property="og:type" content="website">
