@@ -1,4 +1,5 @@
 @font-face { font-family: "Archivo"; src: url("/fonts/archivo-latin-wdth-normal.woff2") format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+@font-face { font-family: "Outfit"; src: url("/fonts/outfit-latin-wght-normal.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: "JetBrains"; src: url("/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 
 /* Diario clásico: tinta sobre papel blanco, una sola familia (Archivo): angosta para la marca y los titulares,
@@ -95,7 +96,8 @@ svg { flex: none; }
 :root[data-theme="dark"] .theme-toggle .i-moon { display: block; }
 @media (hover: hover) { .lang-switch:hover { background: var(--ink); color: var(--bg); } }
 
-.masthead { padding: 22px 0 16px; text-align: center; border-bottom: 2px solid var(--ink); }
+/* El subtítulo queda con el mismo aire arriba (hasta el filete de la marca) y abajo (hasta la línea). */
+.masthead { padding: 22px 0 12px; text-align: center; border-bottom: 2px solid var(--ink); }
 .brand {
   margin: 0;
   font: 800 clamp(2rem, 8.6vw, 5.4rem)/.92 var(--display);
@@ -110,7 +112,7 @@ svg { flex: none; }
 .rr { display: inline-flex; height: .688em; font-size: 1.3663em; line-height: .688; color: var(--brand-r); }
 .rr span { display: block; translate: 0 .01em; }
 .rr .r-flip { transform: scaleX(-1); margin-right: -.015em; }
-.motto { margin: 10px 0 0; font: 700 .9375rem/1.2 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); }
+.motto { margin: 12px 0 0; font: 700 .9375rem/1.2 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--ink); }
 
 /* Secciones */
 .sections {
@@ -334,10 +336,32 @@ svg { flex: none; }
 .colophon { margin-top: 56px; padding: 26px 0 max(28px, env(safe-area-inset-bottom)); border-top: 5px solid var(--ink); color: var(--ink-2); font-size: .9375rem; }
 .foot-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
 .foot-brand p { margin: 10px 0 0; max-width: 46ch; }
-.foot-name { display: inline-flex; align-items: center; gap: 10px; font: 700 1.5rem/1.1 var(--display); font-stretch: 68%; color: var(--ink); }
-.lm { width: 38px; height: 38px; }
-.lm .lm-bg { fill: none; stroke: var(--ink); }
-.lm .lm-m, .lm .lm-bar { fill: var(--ink); }
+/* Marca de Ciber Radar en el pie: las RR entre dos líneas, con las mismas proporciones que la cabecera
+   (línea = .085em, espacio interno = .94em, R de cuerpo .94 / .688). */
+.foot-logo { display: inline-flex; font: 800 2.6rem/1 var(--display); font-stretch: 62%; color: var(--ink); }
+.cr-mark { display: inline-flex; height: calc(.94em + .17em); padding: 0 .06em; border-block: .085em solid currentColor; }
+.cr-mark span { display: block; font-size: 1.3663em; line-height: .688; translate: 0 .01em; color: var(--brand-r); }
+.cr-mark .r-flip { transform: scaleX(-1); margin-right: -.015em; }
+.foot-brand .author { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.author-label { font: 700 .8125rem/1 var(--display); font-stretch: 80%; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+/* Marca de Leandro Martinez: colores y letra de su portfolio, sin cambios */
+.lockup { display: inline-flex; align-items: center; gap: 10px; }
+.lm { width: 40px; height: 40px; flex: none; }
+.lm .lm-bg { fill: #ffffff; }
+.lm .lm-line { stroke: #d9c9ed; }
+.lm .lm-m { fill: #17131f; }
+:root[data-theme="dark"] .lm .lm-bg { fill: #0d0915; }
+:root[data-theme="dark"] .lm .lm-line { stroke: #34283f; }
+:root[data-theme="dark"] .lm .lm-m { fill: #ffffff; }
+.owner-name { font-family: "Outfit", var(--serif); font-size: 1.1875rem; letter-spacing: 0; white-space: nowrap; }
+.owner-first { font-weight: 500; color: #17141b; }
+.owner-last { font-weight: 750; color: #321653; }
+:root[data-theme="dark"] .owner-first { color: #f8f5ff; }
+:root[data-theme="dark"] .owner-last {
+  color: transparent; background: linear-gradient(90deg, #ffffff 0 18%, #d8c6ff 58%, #f4a7d7 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+@media (hover: hover) { .lockup:hover .owner-name { text-decoration: underline; text-decoration-color: #ef86d3; text-underline-offset: 4px; } }
 .foot-col h2 { margin: 2px 0 10px; font: 800 1.0625rem/1.2 var(--display); font-stretch: 72%; letter-spacing: .01em; text-transform: uppercase; color: var(--ink); }
 .foot-col ul { margin: 0; padding: 0; list-style: none; }
 .foot-col li a { overflow-wrap: anywhere; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; color: var(--ink); }
@@ -451,7 +475,7 @@ svg { flex: none; }
 /* En el corte angosto y en mayúsculas el espacio entre palabras queda corto: se abre un poco. */
 .motto, .sections, .wire-label, .column-title, .panel h3, .block-head h2, .block-more, .page-head h1, .day, .foot-col h2,
 .vuln-table thead th, .lang-switch, .more a { word-spacing: .16em; }
-.lead-story h2, .story h3, .wire, .archive a, .foot-name { word-spacing: .06em; }
+.lead-story h2, .story h3, .wire, .archive a { word-spacing: .06em; }
 
 /* Tema oscuro: el texto claro sobre fondo negro se ve más grueso (irradiación). Cada peso baja un escalón
    para que los dos temas se perciban iguales. */

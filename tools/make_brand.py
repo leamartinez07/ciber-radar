@@ -26,16 +26,19 @@ def fonts_css() -> str:
     return (f'@font-face {{ font-family: "Archivo"; src: url("{fonts}/archivo-latin-wdth-normal.woff2"); font-weight: 100 900; font-stretch: 62% 125%; }}')
 
 
-def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
-    """Las dos R espalda con espalda entre dos filetes. scale achica el dibujo para la zona segura."""
-    unit = size * scale
-    rule = f"border-block: {max(1, round(unit * .028))}px solid {INK}; padding: {unit * .035:.1f}px 0 {unit * .012:.1f}px;" if rules else ""
+def icon_html(size: int, scale: float = 1.0) -> str:
+    """El mismo dibujo que el logo del pie: las dos R entre una línea arriba y otra abajo, con las proporciones
+    de la cabecera (línea = .085em, espacio interno = .94em, R de cuerpo .94 / .688). scale achica para la zona segura."""
+    em = size * scale * .56 / 1.11  # el dibujo ocupa el 56 % del alto del ícono
+    line = max(2.0, em * .085)
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
-body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-b {{ display: flex; font: 800 {unit * (.62 if rules else .9):.1f}px/.82 "Archivo"; font-stretch: 62%; color: {RED}; {rule} }}
-i {{ font-style: normal; display: block; transform: scaleX(-1); margin-right: -.052em; }}
-</style></head><body><b><i>R</i>R</b></body></html>'''
+body {{ display: grid; place-items: center; background: {PAPER}; }}
+b {{ display: flex; box-sizing: border-box; height: {em * .94 + 2 * line:.2f}px; padding: 0 {em * .06:.2f}px; border-block: {line:.2f}px solid {INK};
+     font: 800 {em:.2f}px/1 "Archivo"; font-stretch: 62%; }}
+i, u {{ display: block; font-style: normal; text-decoration: none; font-size: 1.3663em; line-height: .688; translate: 0 .01em; color: {RED}; }}
+i {{ transform: scaleX(-1); margin-right: -.015em; }}
+</style></head><body><b><i>R</i><u>R</u></b></body></html>'''
 
 
 def og_html() -> str:
@@ -69,7 +72,7 @@ async def render() -> None:
         ("icon-512.png", icon_html(512), 512),
         ("icon-maskable-512.png", icon_html(512, scale=.74), 512),
         ("apple-touch-icon.png", icon_html(180, scale=.9), 180),
-        ("favicon-32.png", icon_html(32, rules=False), 32),
+        ("favicon-32.png", icon_html(32, scale=1.12), 32),
         ("og.png", og_html(), 0),
     ]
     async with async_playwright() as p:

@@ -83,6 +83,7 @@ LANGS = {
         "not_found": "Página no encontrada", "not_found_text": "Esta página no existe.", "back_home": "Volver a la portada",
         "lang_switch": "English", "lang_switch_label": "Read in English",
         "diary": "Diario", "contact": "Contacto", "portfolio": "Portfolio",
+        "author": "Autor",
         "about": "Ciber Radar es un proyecto de {owner}: reúne cada 30 minutos las noticias de ciberseguridad de fuentes verificadas y las vulnerabilidades que ya se están explotando, y avisa al celular cuando algo es grave.",
         "install": "Instalar en el celular",
         "install_text": "<strong>Android:</strong> abrí el menú de Chrome y tocá «Instalar app». <strong>iPhone:</strong> en Safari tocá Compartir y «Agregar a inicio».",
@@ -159,6 +160,7 @@ LANGS = {
         "not_found": "Page not found", "not_found_text": "This page does not exist.", "back_home": "Back to the front page",
         "lang_switch": "Español", "lang_switch_label": "Leer en español",
         "diary": "Explore", "contact": "Contact", "portfolio": "Portfolio",
+        "author": "Author",
         "about": "Ciber Radar is a project by {owner}: every 30 minutes it gathers cybersecurity news from verified sources and the vulnerabilities already being exploited, and sends a phone alert when something is serious.",
         "install": "Install on your phone",
         "install_text": "<strong>Android:</strong> open the Chrome menu and tap “Install app”. <strong>iPhone:</strong> in Safari tap Share, then “Add to Home Screen”.",
@@ -254,12 +256,18 @@ def source_kinds() -> dict[str, str]:
 
 
 # Marca LM de Leandro Martinez, la misma del portfolio.
+# Marca LM de Leandro Martinez, igual que en su portfolio (favicon-light.svg y favicon-dark.svg): no se cambia su color.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
-    '<rect class="lm-bg" x="1.5" y="1.5" width="61" height="61" rx="2"/>'
+    '<defs><linearGradient id="lm-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#76cee2"/>'
+    '<stop offset=".5" stop-color="#ef86d3"/><stop offset="1" stop-color="#8f5cff"/></linearGradient></defs>'
+    '<rect class="lm-bg" x="1" y="1" width="62" height="62" rx="12"/>'
+    '<rect class="lm-line" x="1.5" y="1.5" width="61" height="61" rx="11.5" fill="none"/>'
     '<g transform="translate(-2.2 3) scale(.29)"><path class="lm-m" d="M40 30H70L118 92L166 30H196V146L172 170H168V78L126 130H110L68 78V142H40Z"/>'
-    '<path class="lm-bar" d="M40 142H128V170H40Z"/></g></svg>'
+    '<path fill="url(#lm-beam)" d="M40 142H128V170H40Z"/></g></svg>'
 )
+# Marca de Ciber Radar: las dos R espalda con espalda entre una línea arriba y otra abajo. Es el mismo dibujo del ícono.
+CR_MARK = '<span class="cr-mark" aria-hidden="true"><span class="r-flip">R</span><span>R</span></span>'
 THEME_ICONS = (
     '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/>'
     '<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
@@ -603,9 +611,11 @@ class Site:
         sections = "".join(f'<li><a href="{lang.path(k)}">{esc(lang.name(k))}</a></li>' for k in NEWS_SECTIONS + ["vulns"])
         return (
             '<footer class="colophon"><div class="foot-grid">'
-            f'<div class="foot-brand"><a class="foot-name" href="{OWNER_URL}" rel="noopener">{BRAND_MARK}'
-            f'<span translate="no">{OWNER}</span></a>'
-            f'<p>{esc(lang["about"].format(owner=OWNER))}</p></div>'
+            f'<div class="foot-brand"><a class="foot-logo" href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{CR_MARK}</a>'
+            f'<p>{esc(lang["about"].format(owner=OWNER))}</p>'
+            f'<p class="author"><span class="author-label">{esc(lang["author"])}:</span> '
+            f'<a class="lockup" href="{OWNER_URL}" rel="noopener" translate="no">{BRAND_MARK}'
+            f'<span class="owner-name"><span class="owner-first">Leandro</span> <span class="owner-last">Martinez</span></span></a></p></div>'
             f'<nav class="foot-col" aria-label="{esc(lang["diary"])}"><h2>{esc(lang["diary"])}</h2><ul>{sections}'
             f'<li><a href="{lang.path("archive")}">{esc(lang["archive"])}</a></li><li><a href="/feed.xml">RSS</a></li></ul></nav>'
             f'<div class="foot-col"><h2>{esc(lang["contact"])}</h2><ul>'
