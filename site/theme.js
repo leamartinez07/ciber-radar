@@ -1,7 +1,7 @@
 "use strict";
-// Se carga antes de pintar para que el tema elegido no parpadee. Claro por defecto; oscuro si se eligió.
-let theme = "light";
+// Se carga antes de pintar para que el tema elegido no parpadee. Oscuro por defecto; claro si se eligió.
+let theme = "dark";
 try {
-  if (localStorage.getItem("ciber-radar:theme") === "dark") theme = "dark";
-} catch { /* sin almacenamiento, queda el claro */ }
+  if (localStorage.getItem("ciber-radar:theme") === "light") theme = "light";
+} catch { /* sin almacenamiento, queda el oscuro */ }
 document.documentElement.dataset.theme = theme;

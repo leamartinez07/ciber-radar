@@ -82,6 +82,7 @@ function markNew(lastVisit) {
 function storyNode(item) {
   const node = el("article", "story");
   const topic = item.category === "General" ? T.regions[item.region] : (T.categories[item.category] || item.category);
+  node.append(el("p", item.alert ? "kicker is-alert" : "kicker", item.alert ? `${T.alert} · ${topic}` : topic));
   const title = el("h3");
   const link = el("a", "", item.title);
   link.href = /^https?:\/\//i.test(item.url) ? item.url : "#";
@@ -92,10 +93,7 @@ function storyNode(item) {
   if (item.lang && item.lang !== pageLang) title.lang = item.lang;
   node.append(title);
   if (item.summary) node.append(el("p", "summary", item.summary));
-  const meta = el("p", "meta");
-  if (item.alert) meta.append(el("span", "flag", T.alert), " ");
-  meta.append(el("span", "subject", topic), ` · ${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
-  node.append(meta);
+  node.append(el("p", "meta", `${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`));
   return node;
 }
 
@@ -202,8 +200,8 @@ function bind() {
   });
 }
 
-// Tema: claro u oscuro. theme.js lo aplica antes de pintar; el claro es el de entrada.
-const THEME_COLORS = { light: "#1a3cff", dark: "#1a3cff" };
+// Tema: oscuro (el de entrada) o claro. theme.js lo aplica antes de pintar. No sigue al sistema.
+const THEME_COLORS = { light: "#f6f4ef", dark: "#0d0b12" };
 
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
@@ -217,7 +215,7 @@ function applyTheme(theme) {
 function bindTheme() {
   const button = $("theme");
   if (!button) return;
-  let theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  let theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
   applyTheme(theme);
   button.addEventListener("click", () => {
     theme = theme === "dark" ? "light" : "dark";

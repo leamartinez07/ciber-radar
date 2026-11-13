@@ -27,7 +27,7 @@ Las fuentes directas son medios especializados, CERT oficiales (CISA, INCIBE-CER
 
 ## Marca
 
-La marca es una R dibujada a medida, grande y al centro: la panza es el visor de un radar, con la señal detectada en el centro, y la pata es el haz que sale del visor. CIBE y ADAR la acompañan a los lados, entre dos filetes que nacen del alto de la R. El dibujo es `r_mark` en `collector/render.py`. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
+La marca es la palabra CIBERRADAR en una sola pieza: la C son tres anillos de radar abiertos hacia el punto de la señal detectada. Es de un solo color; la versión principal es blanca sobre negro y en el tema claro pasa a tinta. `tools/make_brand.py` genera desde ese mismo dibujo el ícono de la app, el ícono adaptable, el favicon y la imagen para redes. Necesita Playwright con Chromium y solo se corre al cambiar la marca.
 
 ## Cambiar qué avisa
 
@@ -41,10 +41,8 @@ En `feeds.toml`, `[rules]` define los términos. Avisa si el título menciona Ar
 
 ## Fuentes tipográficas
 
-Archivo (Omnibus-Type, Buenos Aires) para todo: marca, titulares, texto e interfaz. Es variable en peso y ancho: la marca usa el corte ancho y los titulares, el angosto. JetBrains Mono solo para los identificadores CVE. Ambas con licencia SIL Open Font License 1.1; las licencias están en `site/fonts/`. Archivo viene de `@fontsource-variable/archivo` 5.2.8.
+Inter Tight (titulares), Manrope (interfaz, la misma del portfolio), Source Serif 4 (resúmenes) y JetBrains Mono (solo datos de la barra de alerta), con licencia SIL Open Font License 1.1. Las licencias están en `site/fonts/`.
 
 ## Diseño
 
-Azul cobalto como color de marca, amarillo para lo que se destaca y rojo anaranjado solo para alertas, sobre blanco y tinta azul muy oscura. La cabecera va a sangre sobre el azul. Las alertas se marcan con una ficha de color con la palabra, no con íconos. Esquinas rectas, sin degradados ni sombras. El tema y la ficha de alerta van en la línea de datos, debajo del título. Hay tema claro (el de entrada) y oscuro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA. El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.
-
-Referencias consultadas: la lista de patrones genéricos de `pbakaus/impeccable` (qué evitar: violetas y celestes, fondo crema, cursiva con serifa, puntos que laten, etiqueta sobre cada titular) y `docs/STANDARDS/design-references.md` de MASTER-AI. Para la marca se siguió el método de Allan Peters (formas geométricas simples, un mismo grosor de línea, colores plenos y cálidos, filetes derivados de la geometría del logo), sin copiar ninguna de sus piezas.
+Tema oscuro (el de entrada) y claro, que se elige con el botón de la barra superior; no sigue al sistema. `site/theme.js` lo aplica antes de pintar. Los colores son tokens en `site/styles.css` y cada par texto/fondo pasa WCAG AA (el texto principal, AAA). El pie lleva la marca LM, el copyright, el correo y el portfolio de Leandro Martinez: se editan en las constantes `OWNER*` de `collector/render.py`.

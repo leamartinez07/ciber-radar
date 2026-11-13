@@ -13,7 +13,6 @@ import email.utils
 import hashlib
 import html
 import json
-import math
 import os
 import shutil
 import sys
@@ -162,35 +161,20 @@ LANGS = {
 }
 NEWS_SECTIONS = ["ar", "latam", "mundo", "alert"]
 
-R_WIDTH = 112  # ancho de la R en una caja de alto 100
-
-
-def r_mark(body: str = "", dot: str = "") -> str:
-    """La R de la marca, dibujada a medida: la panza es el visor de un radar, con la señal detectada
-    en el centro, y la pata es el haz que sale del visor y se abre hasta la base.
-    Sin colores, las piezas llevan las clases r-body y r-dot para que las pinte la hoja de estilos."""
-    cx, cy, outer, hole = 56, 34, 34, 17
-    def at(angle: float, radius: float) -> tuple[float, float]:
-        return cx + radius * math.cos(math.radians(angle)), cy + radius * math.sin(math.radians(angle))
-    def foot(angle: float) -> float:
-        return cx + (100 - cy) / math.tan(math.radians(angle))
-    (ax, ay), (bx, by) = at(80, outer - 6), at(50, outer - 6)
-    shape = (f"M0 0H{cx}A{outer} {outer} 0 0 1 {cx} {2 * outer}H26V100H0Z"
-             f"M{cx - hole} {cy}A{hole} {hole} 0 1 0 {cx + hole} {cy}A{hole} {hole} 0 1 0 {cx - hole} {cy}Z")
-    beam = f"M{ax:.1f} {ay:.1f}L{bx:.1f} {by:.1f}L{foot(50):.1f} 100L{foot(80):.1f} 100Z"
-    paint = f'fill="{body}"' if body else 'class="r-body"'
-    dot_paint = f'fill="{dot}"' if dot else 'class="r-dot"'
-    return (f'<path {paint} fill-rule="evenodd" d="{shape}"/><path {paint} d="{beam}"/>'
-            f'<circle {dot_paint} cx="{cx}" cy="{cy}" r="6"/>')
-
-
-EMBLEM = f'<svg class="emblem" viewBox="0 0 {R_WIDTH} 100" aria-hidden="true" focusable="false">{r_mark()}</svg>'
+# La C de la marca: tres anillos de radar abiertos hacia la señal detectada. Un solo color.
+EMBLEM = (
+    '<svg class="emblem" viewBox="0 0 100 100" aria-hidden="true" focusable="false">'
+    '<path d="M86.8 23.3A45.5 45.5 0 1 0 86.8 76.7"/><path d="M74.3 32.4A30.0 30.0 0 1 0 74.3 67.6"/>'
+    '<path d="M61.7 41.5A14.5 14.5 0 1 0 61.7 58.5"/><circle class="blip" cx="86" cy="50" r="7"/></svg>'
+)
 # Marca LM de Leandro Martinez, la misma del portfolio.
 BRAND_MARK = (
     '<svg class="lm" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
-    '<rect class="lm-bg" x="1.5" y="1.5" width="61" height="61" rx="2"/>'
+    '<defs><linearGradient id="lm-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#76cee2"/>'
+    '<stop offset=".5" stop-color="#ef86d3"/><stop offset="1" stop-color="#8f5cff"/></linearGradient></defs>'
+    '<rect class="lm-bg" x="1.5" y="1.5" width="61" height="61" rx="12"/>'
     '<g transform="translate(-2.2 3) scale(.29)"><path class="lm-m" d="M40 30H70L118 92L166 30H196V146L172 170H168V78L126 130H110L68 78V142H40Z"/>'
-    '<path class="lm-bar" d="M40 142H128V170H40Z"/></g></svg>'
+    '<path fill="url(#lm-beam)" d="M40 142H128V170H40Z"/></g></svg>'
 )
 THEME_ICONS = (
     '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/>'
@@ -262,8 +246,9 @@ class Lang:
     def time_tag(self, iso: str) -> str:
         return f'<time datetime="{esc(iso)}" data-rel>{esc(self.short_date(iso))}</time>'
 
-    def topic(self, item: dict) -> str:
-        return self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
+    def kicker(self, item: dict) -> str:
+        topic = self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
+        return f'{self.t["alert"]} · {topic}' if item["alert"] else topic
 
 
 def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story") -> str:
@@ -272,14 +257,13 @@ def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css
         return ""
     item_lang = item.get("lang", "es")
     attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
-    # Tema y alerta van en la línea de datos, debajo del título: el titular no lleva etiqueta encima.
-    flag = f'<span class="flag">{esc(lang["alert"])}</span> ' if item["alert"] else ""
+    kicker = "kicker is-alert" if item["alert"] else "kicker"
     body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
     return (
         f'<article class="{css}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
+        f'<p class="{kicker}">{esc(lang.kicker(item))}</p>'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
-        f'{body}<p class="meta">{flag}<span class="subject">{esc(lang.topic(item))}</span> · {esc(item["source"])} · '
-        f'{lang.time_tag(item["published"])}</p></article>'
+        f'{body}<p class="meta">{esc(item["source"])} · {lang.time_tag(item["published"])}</p></article>'
     )
 
 
@@ -421,7 +405,7 @@ def kev_table(lang: Lang, entries: list[dict], compact: bool = False) -> str:
             cells.append(cell(lang["th_flaw"], esc(e["name"]) + tag, foreign))
         cells.append(cell(lang["th_added"], added))
         if not compact:
-            cells.append(cell(lang["th_due"], f'<span class="date">{esc(lang.date(e["due"]))}</span>' if e["due"] else "—"))
+            cells.append(cell(lang["th_due"], esc(lang.date(e["due"])) if e["due"] else "—"))
         cells.append(cell(lang["th_epss"], epss_cell(lang, e)))
         rows.append(f'<tr role="row">{ROW_HEAD}{link}</th>{"".join(cells)}</tr>')
     heads = [lang["th_cve"], lang["th_product"]] + ([] if compact else [lang["th_flaw"]]) + [lang["th_added"]]
@@ -500,7 +484,7 @@ class Site:
         attr = f' lang="{esc(latest.get("lang", "es"))}"' if latest.get("lang", "es") != lang.code else ""
         return (
             f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}">'
-            f'<div class="wire-news"><span class="wire-label">{esc(lang["latest_alert"])}</span>'
+            f'<div class="wire-news"><span class="wire-label"><span class="pulse" aria-hidden="true"></span>{esc(lang["latest_alert"])}</span>'
             f'<a{attr} href="{esc(safe_url(latest["url"]))}" target="_blank" rel="noopener noreferrer">{esc(latest["title"])}</a>'
             f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></div>{chart}</aside>'
         )
@@ -557,7 +541,7 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}"><span class="side">Cibe</span>{EMBLEM}<span class="sr">r</span><span class="side">adar</span></a>'
+        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{EMBLEM}<span class="sr">C</span><span class="thin">iber</span>Radar</a>'
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}
@@ -581,7 +565,7 @@ class Site:
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{esc(canonical)}">
 {hreflang if indexable else ""}
-<meta name="theme-color" content="#1a3cff">
+<meta name="theme-color" content="#0d0b12">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
 <meta property="og:type" content="website">
@@ -600,7 +584,8 @@ class Site:
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
 <script src="{self.assets["app.js"]}" defer></script>
