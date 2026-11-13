@@ -34,9 +34,10 @@ def icon_html(size: int, scale: float = 1.0, rules: bool = True) -> str:
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>{fonts_css()}
 html, body {{ margin: 0; width: {size}px; height: {size}px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
-b {{ display: flex; font: 400 {unit * (.58 if rules else .84):.1f}px/.8 "DM Serif"; color: {RED}; {rule} }}
-i {{ font-style: normal; display: block; transform: scaleX(-1); }}
-</style></head><body><b><i>R</i>R</b></body></html>'''
+b {{ display: flex; font: 400 {unit * (.62 if rules else .9):.1f}px/.672 "DM Serif"; color: {RED}; {rule} }}
+i, u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0145em; }}
+i {{ transform: scaleX(-1); }}
+</style></head><body><b><i>R</i><u>R</u></b></body></html>'''
 
 
 def og_html() -> str:
@@ -44,12 +45,13 @@ def og_html() -> str:
 html, body {{ margin: 0; width: 1200px; height: 630px; overflow: hidden; }}
 body {{ display: grid; place-items: center; background: {PAPER}; color: {INK}; }}
 .plate {{ display: flex; flex-direction: column; align-items: center; }}
-h1 {{ display: flex; align-items: center; margin: 0; font: 850 118px/.92 "Schibsted"; letter-spacing: -.01em; white-space: nowrap; }}
-h1 .side {{ display: block; padding: .08em .05em .03em; border-block: .085em solid {INK}; line-height: .9; }}
-h1 .rr {{ display: flex; margin: 0 .06em; font: 400 1.6em/.76 "DM Serif"; color: {RED}; }}
-h1 .rr i {{ font-style: normal; display: block; transform: scaleX(-1); }}
+h1 {{ display: flex; align-items: center; gap: .17em; margin: 0; font: 850 118px/.92 "Schibsted"; letter-spacing: -.01em; white-space: nowrap; }}
+h1 .side {{ display: block; height: 1.18em; padding: .08em .05em .03em; border-block: .085em solid {INK}; line-height: .9; }}
+h1 .rr {{ display: flex; height: .672em; font: 400 1.756em/.672 "DM Serif"; color: {RED}; }}
+h1 .rr i, h1 .rr u {{ font-style: normal; text-decoration: none; display: block; translate: 0 -.0145em; }}
+h1 .rr i {{ transform: scaleX(-1); }}
 p {{ margin: 36px 0 0; font: 500 30px/1.2 "Schibsted"; color: {GREY}; white-space: nowrap; }}
-</style></head><body><div class="plate"><h1><span class="side">CIBE</span><span class="rr"><i>R</i>R</span><span class="side">ADAR</span></h1>
+</style></head><body><div class="plate"><h1><span class="side">CIBE</span><span class="rr"><i>R</i><u>R</u></span><span class="side">ADAR</span></h1>
 <p>Noticias de ciberseguridad de Argentina, Latinoamérica y el mundo</p></div></body></html>'''
 
 

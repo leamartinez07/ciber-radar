@@ -98,7 +98,7 @@ function storyNode(item) {
   if (item.summary) node.append(el("p", "summary", item.summary));
   const meta = el("p", "meta");
   if (item.category !== "General") meta.append(el("span", "subject", T.categories[item.category] || item.category), " · ");
-  meta.append(`${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
+  meta.append(`${item.source} `, el("span", "when", `· ${relative(item.published) || shortDate.format(new Date(item.published))}`));
   node.append(meta);
   return node;
 }

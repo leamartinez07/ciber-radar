@@ -346,7 +346,7 @@ def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css
         f'<article class="{css}" data-region="{esc(item["region"])}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
         f'<p class="tags">{region_chip(lang, item)}{flag}</p>'
         f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
-        f'{body}<p class="meta">{topic}{esc(item["source"])} · {lang.time_tag(item["published"])}</p></article>'
+        f'{body}<p class="meta">{topic}{esc(item["source"])} <span class="when">· {lang.time_tag(item["published"])}</span></p></article>'
     )
 
 
