@@ -1,0 +1,672 @@
+{
+ "project": "ciber-radar",
+ "created_at": "2026-11-14T03:28:57.871897Z",
+ "disciplines": [
+  "security",
+  "ai-tooling",
+  "web-frontend",
+  "ui-ux",
+  "seo-performance",
+  "branding"
+ ],
+ "ttl_days": 14,
+ "ttl_why": "Los incidentes de cadena de suministro y las vulnerabilidades aparecen en días; D-002 nació de uno.",
+ "expires_at": "2026-11-28T03:28:57.871889Z",
+ "sources": [
+  {
+   "name": "OWASP Top 10",
+   "url": "https://owasp.org/www-project-top-ten/",
+   "kind": "official",
+   "discipline": "security",
+   "accessed_at": "2026-11-12T02:50:35.590704Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 89565,
+   "sha256": "865275a5d4472a18a532f7ef8a5cfe71bf7c95b37e0abc2415e389bfbc68d20c",
+   "title": "OWASP Top 10 | OWASP Foundation"
+  },
+  {
+   "name": "MDN Content Security Policy",
+   "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP",
+   "kind": "official",
+   "discipline": "security",
+   "accessed_at": "2026-11-12T02:50:36.593853Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 256369,
+   "sha256": "9546a9cba33ecc0e3834106a9a91a68253b596b14331e6718798ae706be90a48",
+   "title": "Content Security Policy (CSP) - HTTP | MDN"
+  },
+  {
+   "name": "Claude Code docs",
+   "url": "https://code.claude.com/docs/en/overview",
+   "kind": "official",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-12T02:50:37.099654Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 351993,
+   "sha256": "2c1fecbc6e9a0b623b63cb0fbdef46c6f63683a8ba57c8a4b867fe43c941b35c",
+   "title": "Overview - Claude Code Docs"
+  },
+  {
+   "name": "MCP Registry",
+   "url": "https://github.com/modelcontextprotocol/registry",
+   "kind": "official",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-12T02:50:38.827647Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 328153,
+   "sha256": "cf61370b968147f4ded9705e7a3a9932765ad5f22fac6aa0e406543c8f25bc65",
+   "title": "GitHub - modelcontextprotocol/registry: A community driven registry service for Model Context Protocol (MCP) servers. · GitHub"
+  },
+  {
+   "name": "web.dev Baseline",
+   "url": "https://web.dev/baseline",
+   "kind": "official",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-12T02:50:40.208204Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 215715,
+   "sha256": "6eb4b30525464211e87850ea52f826a7c02e8b7c8723fe20ea643b811e48aed2",
+   "title": "Baseline &nbsp;|&nbsp; web.dev"
+  },
+  {
+   "name": "MDN Web Docs",
+   "url": "https://developer.mozilla.org/en-US/docs/Web",
+   "kind": "official",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-12T02:50:41.206947Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 149818,
+   "sha256": "3cefe7d646f40a99db43f02abd2df5359ac45c905ea7bb3298a5f30edbc216dd",
+   "title": "Web technology for developers | MDN"
+  },
+  {
+   "name": "WCAG 2.2",
+   "url": "https://www.w3.org/TR/WCAG22/",
+   "kind": "official",
+   "discipline": "ui-ux",
+   "accessed_at": "2026-11-12T02:50:42.362292Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 512457,
+   "sha256": "6e3c5fe397257cae509a2fb4752b73062cf8cbeb92c2cec618989b17e4cf7057",
+   "title": "Web Content Accessibility Guidelines (WCAG) 2.2"
+  },
+  {
+   "name": "WAI-ARIA Authoring Practices",
+   "url": "https://www.w3.org/WAI/ARIA/apg/",
+   "kind": "official",
+   "discipline": "ui-ux",
+   "accessed_at": "2026-11-12T02:50:42.517624Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 39382,
+   "sha256": "9b1d15a7df2fbf071fbfd706a9373f807011f2997fba28807ed6aaff86afff74",
+   "title": "ARIA Authoring Practices Guide | APG | WAI | W3C"
+  },
+  {
+   "name": "Web Vitals",
+   "url": "https://web.dev/articles/vitals",
+   "kind": "official",
+   "discipline": "seo-performance",
+   "accessed_at": "2026-11-12T02:50:43.384453Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 145934,
+   "sha256": "99328288837d15754ae9532a65a94c0deb181477751e769ad56d4f77866ba11b",
+   "title": "Web Vitals &nbsp;|&nbsp; Articles &nbsp;|&nbsp; web.dev"
+  },
+  {
+   "name": "Google Search Central",
+   "url": "https://developers.google.com/search/docs",
+   "kind": "official",
+   "discipline": "seo-performance",
+   "accessed_at": "2026-11-12T02:50:43.879746Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 190780,
+   "sha256": "da3558307b00e30d35dc0c251406583e88c9db1cd94ba6c041eddc46b15d9e16",
+   "title": "Documentation to Improve SEO | Google Search Central &nbsp;|&nbsp; Google for Developers"
+  },
+  {
+   "name": "WIPO Global Brand Database",
+   "url": "https://www.wipo.int/en/web/global-brand-database",
+   "kind": "official",
+   "discipline": "branding",
+   "accessed_at": "2026-11-12T02:50:44.849741Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 110672,
+   "sha256": "efe1b410a278449885641cf8c763e08f86bade627a3a1e2fa7dd30e038f4579a",
+   "title": "Global Brand Database"
+  },
+  {
+   "name": "CISA KEV, feed JSON",
+   "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+   "kind": "research",
+   "discipline": "security",
+   "accessed_at": "2026-11-14T03:28:50.404314Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 1854379,
+   "sha256": "4028ec035856331a717d3305e87e45be37d400fc500da34a5464f05fc2773764",
+   "title": ""
+  },
+  {
+   "name": "emilkowalski/skills",
+   "url": "https://github.com/emilkowalski/skills",
+   "kind": "research",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-14T03:28:50.698404Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 233801,
+   "sha256": "24f81d73d41bd5f27f97deb14cd4206fb4d1c2d72b4ffffdc2f80cddb2dc39ba",
+   "title": "GitHub - emilkowalski/skills: Skills for Designers and Engineers. · GitHub"
+  },
+  {
+   "name": "MDN text-wrap",
+   "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap",
+   "kind": "research",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-14T03:28:51.543095Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 336425,
+   "sha256": "08593ef813e905af8b68e26fdece5b465b696851eb5bdd193632cdae4419c568",
+   "title": "text-wrap CSS property - CSS | MDN"
+  },
+  {
+   "name": "llama.cpp b12374",
+   "url": "https://github.com/ggml-org/llama.cpp/releases/tag/b12374",
+   "kind": "research",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-14T03:28:52.189671Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 160444,
+   "sha256": "7733f18060204500c32e4839a5f292b6b0acbaf3ad882579b8a4a302a318a992",
+   "title": "Release b12374 · ggml-org/llama.cpp · GitHub"
+  },
+  {
+   "name": "unsloth/Qwen3.5-4B-GGUF",
+   "url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+   "kind": "research",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-14T03:28:52.897685Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 397349,
+   "sha256": "7c03489e4dee27f43615d9c3806b73dd482066f55b3ffa1e76d8a53deeca47d1",
+   "title": "unsloth/Qwen3.5-4B-GGUF · Hugging Face"
+  },
+  {
+   "name": "google/gemma-4-E4B-it",
+   "url": "https://huggingface.co/google/gemma-4-E4B-it",
+   "kind": "research",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-14T03:28:53.576250Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 455158,
+   "sha256": "7d27cd8c6fe173e09315adcd79f381b3a4b601506247e8ee8e694b775a6f9ab9",
+   "title": "google/gemma-4-E4B-it · Hugging Face"
+  },
+  {
+   "name": "NCSC, términos",
+   "url": "https://www.ncsc.gov.uk/section/about-this-website/terms-and-conditions",
+   "kind": "research",
+   "discipline": "security",
+   "accessed_at": "2026-11-14T03:28:54.374539Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 228066,
+   "sha256": "79f426a61751fb8d3c95ca3245353395cf53d581d6a94fa5116b14adcf58821b",
+   "title": "Terms &amp; conditions | National Cyber Security Centre"
+  },
+  {
+   "name": "CISA, linking policy",
+   "url": "https://www.cisa.gov/linking-policy",
+   "kind": "research",
+   "discipline": "security",
+   "accessed_at": "2026-11-14T03:28:54.972068Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 50780,
+   "sha256": "42c5904a66dc41a5aae03a32c37b993deb5cbac1f08e03783dbaf18cb076f72a",
+   "title": "Linking Policy | CISA"
+  },
+  {
+   "name": "GitHub blog",
+   "url": "https://github.blog/2024-01-17-github-hosted-runners-double-the-power-for-open-source/",
+   "kind": "research",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-14T03:28:55.285893Z",
+   "status": "ok",
+   "http": 200,
+   "bytes": 170880,
+   "sha256": "9acb322f915e429fec8919e597f74c7698b3e4d9ecccdaddb3d6bb0c73d6a1a1",
+   "title": "GitHub-hosted runners: Double the power for open source - The GitHub Blog"
+  }
+ ],
+ "repos": [
+  {
+   "repo": "modelcontextprotocol/registry",
+   "discipline": "ai-tooling",
+   "accessed_at": "2026-11-12T02:50:39.740202Z",
+   "status": "ok",
+   "latest": "v1.8.9"
+  },
+  {
+   "repo": "withastro/astro",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-12T02:50:41.652192Z",
+   "status": "ok",
+   "latest": "@astrojs/vue@7.1.5"
+  },
+  {
+   "repo": "microsoft/playwright",
+   "discipline": "web-frontend",
+   "accessed_at": "2026-11-12T02:50:42.014665Z",
+   "status": "ok",
+   "latest": "v1.65.0"
+  },
+  {
+   "repo": "dequelabs/axe-core",
+   "discipline": "ui-ux",
+   "accessed_at": "2026-11-12T02:50:42.746488Z",
+   "status": "ok",
+   "latest": "v4.14.0"
+  }
+ ],
+ "library": [
+  {
+   "repo": "emilkowalski/skills",
+   "discipline": "ui-ux",
+   "checked_at": "2026-11-12T02:50:45.584599Z",
+   "status": "fetched",
+   "version": "4061b67b8d976a186aca118594f54b638c5f718a",
+   "path": "library/emilkowalski__skills@4061b67b8d97",
+   "license": "MIT",
+   "files": 34,
+   "bytes": 348752,
+   "skipped": 0
+  },
+  {
+   "repo": "vercel-labs/web-interface-guidelines",
+   "discipline": "ui-ux",
+   "checked_at": "2026-11-12T02:50:47.365862Z",
+   "status": "fetched",
+   "version": "434b7f91364665f2f733b310ec54809bf8f37937",
+   "path": "library/vercel-labs__web-interface-guidelines@434b7f913646",
+   "license": "MIT",
+   "files": 5,
+   "bytes": 41037,
+   "skipped": 0
+  },
+  {
+   "repo": "pbakaus/impeccable",
+   "discipline": "ui-ux",
+   "checked_at": "2026-11-12T02:50:48.594413Z",
+   "status": "needs_approval",
+   "version": "b4bff1626c344067788c2679f048a20057c7cc5a",
+   "license": "Apache-2.0",
+   "reasons": [
+    "pesa más de 80 MB"
+   ]
+  },
+  {
+   "repo": "Leonxlnx/taste-skill",
+   "discipline": "ui-ux",
+   "checked_at": "2026-11-12T02:50:49.427295Z",
+   "status": "needs_approval",
+   "version": "f6b76575f949707b4e3c37cd86cb44b0b98643e8",
+   "license": "MIT",
+   "reasons": [
+    "pesa más de 80 MB"
+   ]
+  },
+  {
+   "repo": "w3c/aria-practices",
+   "discipline": "ui-ux",
+   "checked_at": "2026-11-12T02:50:50.258521Z",
+   "status": "needs_approval",
+   "version": "0f765e4dc33e966026114ac12a8380db1de3b787",
+   "license": "NOASSERTION",
+   "reasons": [
+    "licencia NOASSERTION: requiere revisión"
+   ]
+  },
+  {
+   "repo": "vercel-labs/agent-skills",
+   "discipline": "web-frontend",
+   "checked_at": "2026-11-12T02:50:51.130332Z",
+   "status": "needs_approval",
+   "version": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+   "license": "NOASSERTION",
+   "reasons": [
+    "licencia NOASSERTION: requiere revisión"
+   ]
+  },
+  {
+   "repo": "primer/primitives",
+   "discipline": "web-frontend",
+   "checked_at": "2026-11-12T02:50:51.967425Z",
+   "status": "needs_approval",
+   "version": "47736486bf67b2a14ba1ada61fa0f57af29bb875",
+   "license": "MIT",
+   "reasons": [
+    "pesa más de 80 MB"
+   ]
+  },
+  {
+   "repo": "anthropics/skills",
+   "discipline": "ai-tooling",
+   "checked_at": "2026-11-12T02:50:53.841548Z",
+   "status": "needs_approval",
+   "version": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+   "license": "NOASSERTION",
+   "reasons": [
+    "licencia NOASSERTION: requiere revisión"
+   ]
+  },
+  {
+   "repo": "anthropics/claude-cookbooks",
+   "discipline": "ai-tooling",
+   "checked_at": "2026-11-12T02:50:54.668167Z",
+   "status": "needs_approval",
+   "version": "ce8b2629efe8b24048b127b4c79af1e9cbab93d4",
+   "license": "MIT",
+   "reasons": [
+    "pesa más de 80 MB"
+   ]
+  },
+  {
+   "repo": "OWASP/CheatSheetSeries",
+   "discipline": "security",
+   "checked_at": "2026-11-12T02:50:55.473369Z",
+   "status": "needs_approval",
+   "version": "9c87d0a0e9411de028b9d7eb853872082d6d3382",
+   "license": "CC-BY-SA-4.0",
+   "reasons": [
+    "licencia CC-BY-SA-4.0: requiere revisión",
+    "pesa más de 80 MB"
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "tool": "cisa-kev",
+   "claim": "El catálogo KEV de CISA se publica como JSON, gratis y sin clave, con licencia CC0. Versión 2026.11.10 con 1779 fallos. Es la fuente de 'explotadas ahora'.",
+   "source_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+   "source_name": "CISA KEV, feed JSON"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "claim": "La CSP del sitio no permite scripts ni estilos en línea y exige Trusted Types. Se comprobó: el navegador rechazó la inyección de axe hasta desactivar la CSP en el navegador de prueba.",
+   "source_url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP",
+   "source_name": "MDN Content Security Policy"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "emilkowalski-skills",
+   "claim": "emilkowalski/skills (MIT) quedó en la biblioteca de referencia, fijado al commit 4061b67. Se lee para decidir qué se anima; no se instala como skill.",
+   "source_url": "https://github.com/emilkowalski/skills",
+   "source_name": "emilkowalski/skills"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "claim": "El proyecto no necesita MCP ni plugins: las noticias llegan por RSS y las vulnerabilidades por tres APIs públicas sin clave.",
+   "source_url": "https://github.com/modelcontextprotocol/registry",
+   "source_name": "MCP Registry"
+  },
+  {
+   "discipline": "web-frontend",
+   "maturity": "mature",
+   "claim": "text-wrap: pretty y las transiciones entre páginas se usan como mejora progresiva: sin soporte, el sitio se ve y funciona igual.",
+   "source_url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap",
+   "source_name": "MDN text-wrap"
+  },
+  {
+   "discipline": "ui-ux",
+   "maturity": "mature",
+   "claim": "WCAG 2.2 AA pide contraste 4,5:1 para texto y objetivos táctiles de 24 px. El sitio mide 5,7:1 como mínimo y axe no encontró problemas en Chromium ni Firefox.",
+   "source_url": "https://www.w3.org/TR/WCAG22/",
+   "source_name": "WCAG 2.2"
+  },
+  {
+   "discipline": "seo-performance",
+   "maturity": "mature",
+   "claim": "Web Vitals fija LCP hasta 2,5 s y CLS hasta 0,1. Medido en laboratorio, celular con CPU x4 y red lenta: LCP 0,75 s, CLS 0, 159 KB.",
+   "source_url": "https://web.dev/articles/vitals",
+   "source_name": "Web Vitals"
+  },
+  {
+   "discipline": "branding",
+   "maturity": "experimental",
+   "claim": "La base global de marcas de la OMPI permite buscar 'Ciber Radar' antes de registrar. Esa búsqueda y la del INPI argentino no se hicieron todavía.",
+   "source_url": "https://www.wipo.int/en/web/global-brand-database",
+   "source_name": "WIPO Global Brand Database"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "llama.cpp",
+   "claim": "llama.cpp (MIT, ggml-org) publica binarios para Ubuntu x64 en cada versión; la b12374 es del 2026-11-14. Corre modelos GGUF en CPU, sin GPU ni clave.",
+   "source_url": "https://github.com/ggml-org/llama.cpp/releases/tag/b12374",
+   "source_name": "llama.cpp b12374"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "qwen3.5-4b",
+   "claim": "Qwen3.5 4B tiene licencia Apache 2.0; el GGUF Q4_K_M pesa 2,74 GB. Una guía de 2026 lo recomienda como el mejor punto de partida para usar solo CPU.",
+   "source_url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+   "source_name": "unsloth/Qwen3.5-4B-GGUF"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "gemma-4-e4b",
+   "claim": "Gemma 4 E4B (Google) tiene licencia Apache 2.0, con GGUF Q4_K_M disponible. Es la alternativa para comparar en español.",
+   "source_url": "https://huggingface.co/google/gemma-4-E4B-it",
+   "source_name": "google/gemma-4-E4B-it"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "claim": "Las páginas del NCSC tienen Crown copyright y se pueden reutilizar bajo la Open Government Licence v3.0, citando la fuente; los logos quedan excluidos.",
+   "source_url": "https://www.ncsc.gov.uk/section/about-this-website/terms-and-conditions",
+   "source_name": "NCSC, términos"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "claim": "Todo el contenido de cisa.gov es TLP:CLEAR y la agencia describe su sitio como de dominio público (obra del gobierno de EE. UU.).",
+   "source_url": "https://www.cisa.gov/linking-policy",
+   "source_name": "CISA, linking policy"
+  },
+  {
+   "discipline": "web-frontend",
+   "maturity": "mature",
+   "claim": "Para repositorios públicos, GitHub Actions da sin costo máquinas ubuntu-latest de 4 vCPU y 16 GB.",
+   "source_url": "https://github.blog/2024-01-17-github-hosted-runners-double-the-power-for-open-source/",
+   "source_name": "GitHub blog"
+  }
+ ],
+ "dropped_findings": [],
+ "comparison": [
+  {
+   "tool": "cisa-kev",
+   "maturity": "mature",
+   "registered": false,
+   "status": "new",
+   "version": null
+  },
+  {
+   "tool": "emilkowalski-skills",
+   "maturity": "mature",
+   "registered": false,
+   "status": "new",
+   "version": null
+  },
+  {
+   "tool": "llama.cpp",
+   "maturity": "mature",
+   "registered": false,
+   "status": "new",
+   "version": null
+  },
+  {
+   "tool": "qwen3.5-4b",
+   "maturity": "mature",
+   "registered": false,
+   "status": "new",
+   "version": null
+  },
+  {
+   "tool": "gemma-4-e4b",
+   "maturity": "mature",
+   "registered": false,
+   "status": "new",
+   "version": null
+  }
+ ],
+ "selection": {
+  "agents": [
+   "branding",
+   "creative-direction",
+   "marketing",
+   "research",
+   "security",
+   "ui-ux-design",
+   "web-development"
+  ],
+  "router_ranking": [],
+  "executor": "session",
+  "herramientas": "Python sin dependencias para recolectar y generar; Playwright y axe-core, ya instalados, para el control",
+  "criterio": "Costo 0. Sin terceros en el sitio publicado. Datos de fuentes oficiales"
+ },
+ "candidates": [
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "llama.cpp",
+   "kind": "tool",
+   "version": "b12374",
+   "license": "MIT",
+   "source": "https://github.com/ggml-org/llama.cpp/releases/tag/b12374",
+   "utility": "Ejecuta el modelo de lenguaje dentro de GitHub Actions para resumir y traducir las noticias gratis",
+   "install": "En el workflow: descargar llama-b12374-bin-ubuntu-x64.tar.gz del release oficial, verificar su SHA-256 y guardarlo en la caché de Actions. No se instala nada en la PC del fundador.",
+   "plain": "Un programa libre (llama.cpp) que corre dentro de GitHub, gratis, para que una IA abierta escriba el resumen de cada noticia en español y en inglés. No necesita cuentas, claves ni tarjeta",
+   "fallback": "Cada nota se abre dentro del sitio igual, pero con el extracto que manda el medio, sin traducir",
+   "evaluation": {
+    "verdict": "approval_required",
+    "fatal": [],
+    "notes": [
+     "permisos sensibles: ['network-unrestricted']",
+     "sin prueba aislada todavía"
+    ]
+   }
+  },
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "qwen3.5-4b-gguf",
+   "kind": "library",
+   "version": "e87f176479d0855a907a41277aca2f8ee7a09523",
+   "license": "Apache-2.0",
+   "source": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+   "utility": "Modelo que resume y traduce; se compara con Gemma 4 E4B y queda el mejor en español",
+   "install": "En el workflow: descargar Qwen3.5-4B-Q4_K_M.gguf fijado a ese commit, verificar SHA-256 y guardarlo en la caché de Actions.",
+   "plain": "El modelo de IA abierto (Qwen3.5 4B, 2,7 GB) que escribe los resúmenes; se prueba contra Gemma 4 y queda el que escriba mejor",
+   "fallback": "Usar solo Gemma 4 E4B, o el extracto del medio sin IA",
+   "evaluation": {
+    "verdict": "approval_required",
+    "fatal": [],
+    "notes": [
+     "permisos sensibles: ['network-unrestricted']",
+     "sin prueba aislada todavía"
+    ]
+   }
+  },
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "gemma-4-e4b-gguf",
+   "kind": "library",
+   "version": "4ecc2ba63bcac23ba4a767fc87025b1450f84c9c",
+   "license": "Apache-2.0",
+   "source": "https://huggingface.co/google/gemma-4-E4B-it",
+   "utility": "Alternativa a Qwen3.5 para resumir y traducir en español",
+   "install": "En el workflow: descargar gemma-4-E4B-it-Q4_K_M.gguf fijado, verificar SHA-256 y guardarlo en la caché de Actions.",
+   "plain": "Segundo modelo abierto (Gemma 4 de Google) para comparar cuál resume mejor",
+   "fallback": "Usar solo Qwen3.5 4B",
+   "evaluation": {
+    "verdict": "approval_required",
+    "fatal": [],
+    "notes": [
+     "permisos sensibles: ['network-unrestricted']",
+     "sin prueba aislada todavía"
+    ]
+   }
+  }
+ ],
+ "approval": {
+  "status": "pending",
+  "id": "63d35cd6f3f8",
+  "target": "bundle:ciber-radar:a4d4a8557d",
+  "items": [
+   {
+    "id": "llama.cpp",
+    "plain": "Un programa libre (llama.cpp) que corre dentro de GitHub, gratis, para que una IA abierta escriba el resumen de cada noticia en español y en inglés. No necesita cuentas, claves ni tarjeta",
+    "fallback": "Cada nota se abre dentro del sitio igual, pero con el extracto que manda el medio, sin traducir"
+   },
+   {
+    "id": "qwen3.5-4b-gguf",
+    "plain": "El modelo de IA abierto (Qwen3.5 4B, 2,7 GB) que escribe los resúmenes; se prueba contra Gemma 4 y queda el que escriba mejor",
+    "fallback": "Usar solo Gemma 4 E4B, o el extracto del medio sin IA"
+   },
+   {
+    "id": "gemma-4-e4b-gguf",
+    "plain": "Segundo modelo abierto (Gemma 4 de Google) para comparar cuál resume mejor",
+    "fallback": "Usar solo Qwen3.5 4B"
+   }
+  ]
+ },
+ "learnings": [
+  "Ciber Radar: FIRST EPSS responde 400 si el pedido prioriza XML en Accept; hay que pedir application/json.",
+  "Ciber Radar: de Google Noticias solo entran medios de la lista [trusted] de feeds.toml, comparando el dominio del <source url>.",
+  "Copiar notas enteras de medios privados infringe derechos de autor aunque se retiren al primer reclamo: se publica un resumen propio, y texto completo solo de CISA (dominio público) y NCSC (OGL v3).",
+  "Las notas de Google Noticias traen un enlace cifrado: sin decodificarlo no hay imagen ni texto de la nota original."
+ ],
+ "open_questions": [
+  "Búsqueda de la marca 'Ciber Radar' en INPI y OMPI antes de registrar dominio o marca.",
+  "El proyecto no tiene repositorio remoto: la actualización cada 30 minutos no corre hasta crearlo y conectarlo a Vercel."
+ ]
+}

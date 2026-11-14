@@ -1,38 +1,174 @@
 {
  "findings": [
-  {"discipline": "security", "maturity": "mature", "tool": "cisa-kev",
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "tool": "cisa-kev",
    "claim": "El catálogo KEV de CISA se publica como JSON, gratis y sin clave, con licencia CC0. Versión 2026.11.10 con 1779 fallos. Es la fuente de 'explotadas ahora'.",
-   "source_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json", "source_name": "CISA KEV, feed JSON"},
-  {"discipline": "security", "maturity": "mature",
+   "source_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+   "source_name": "CISA KEV, feed JSON"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
    "claim": "La CSP del sitio no permite scripts ni estilos en línea y exige Trusted Types. Se comprobó: el navegador rechazó la inyección de axe hasta desactivar la CSP en el navegador de prueba.",
-   "source_url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP", "source_name": "MDN Content Security Policy"},
-  {"discipline": "ai-tooling", "maturity": "mature", "tool": "emilkowalski-skills",
+   "source_url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP",
+   "source_name": "MDN Content Security Policy"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "emilkowalski-skills",
    "claim": "emilkowalski/skills (MIT) quedó en la biblioteca de referencia, fijado al commit 4061b67. Se lee para decidir qué se anima; no se instala como skill.",
-   "source_url": "https://github.com/emilkowalski/skills", "source_name": "emilkowalski/skills"},
-  {"discipline": "ai-tooling", "maturity": "mature",
+   "source_url": "https://github.com/emilkowalski/skills",
+   "source_name": "emilkowalski/skills"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
    "claim": "El proyecto no necesita MCP ni plugins: las noticias llegan por RSS y las vulnerabilidades por tres APIs públicas sin clave.",
-   "source_url": "https://github.com/modelcontextprotocol/registry", "source_name": "MCP Registry"},
-  {"discipline": "web-frontend", "maturity": "mature",
+   "source_url": "https://github.com/modelcontextprotocol/registry",
+   "source_name": "MCP Registry"
+  },
+  {
+   "discipline": "web-frontend",
+   "maturity": "mature",
    "claim": "text-wrap: pretty y las transiciones entre páginas se usan como mejora progresiva: sin soporte, el sitio se ve y funciona igual.",
-   "source_url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap", "source_name": "MDN text-wrap"},
-  {"discipline": "ui-ux", "maturity": "mature",
+   "source_url": "https://developer.mozilla.org/en-US/docs/Web/CSS/text-wrap",
+   "source_name": "MDN text-wrap"
+  },
+  {
+   "discipline": "ui-ux",
+   "maturity": "mature",
    "claim": "WCAG 2.2 AA pide contraste 4,5:1 para texto y objetivos táctiles de 24 px. El sitio mide 5,7:1 como mínimo y axe no encontró problemas en Chromium ni Firefox.",
-   "source_url": "https://www.w3.org/TR/WCAG22/", "source_name": "WCAG 2.2"},
-  {"discipline": "seo-performance", "maturity": "mature",
+   "source_url": "https://www.w3.org/TR/WCAG22/",
+   "source_name": "WCAG 2.2"
+  },
+  {
+   "discipline": "seo-performance",
+   "maturity": "mature",
    "claim": "Web Vitals fija LCP hasta 2,5 s y CLS hasta 0,1. Medido en laboratorio, celular con CPU x4 y red lenta: LCP 0,75 s, CLS 0, 159 KB.",
-   "source_url": "https://web.dev/articles/vitals", "source_name": "Web Vitals"},
-  {"discipline": "branding", "maturity": "experimental",
+   "source_url": "https://web.dev/articles/vitals",
+   "source_name": "Web Vitals"
+  },
+  {
+   "discipline": "branding",
+   "maturity": "experimental",
    "claim": "La base global de marcas de la OMPI permite buscar 'Ciber Radar' antes de registrar. Esa búsqueda y la del INPI argentino no se hicieron todavía.",
-   "source_url": "https://www.wipo.int/en/web/global-brand-database", "source_name": "WIPO Global Brand Database"}
+   "source_url": "https://www.wipo.int/en/web/global-brand-database",
+   "source_name": "WIPO Global Brand Database"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "llama.cpp",
+   "claim": "llama.cpp (MIT, ggml-org) publica binarios para Ubuntu x64 en cada versión; la b12374 es del 2026-11-14. Corre modelos GGUF en CPU, sin GPU ni clave.",
+   "source_url": "https://github.com/ggml-org/llama.cpp/releases/tag/b12374",
+   "source_name": "llama.cpp b12374"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "qwen3.5-4b",
+   "claim": "Qwen3.5 4B tiene licencia Apache 2.0; el GGUF Q4_K_M pesa 2,74 GB. Una guía de 2026 lo recomienda como el mejor punto de partida para usar solo CPU.",
+   "source_url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+   "source_name": "unsloth/Qwen3.5-4B-GGUF"
+  },
+  {
+   "discipline": "ai-tooling",
+   "maturity": "mature",
+   "tool": "gemma-4-e4b",
+   "claim": "Gemma 4 E4B (Google) tiene licencia Apache 2.0, con GGUF Q4_K_M disponible. Es la alternativa para comparar en español.",
+   "source_url": "https://huggingface.co/google/gemma-4-E4B-it",
+   "source_name": "google/gemma-4-E4B-it"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "claim": "Las páginas del NCSC tienen Crown copyright y se pueden reutilizar bajo la Open Government Licence v3.0, citando la fuente; los logos quedan excluidos.",
+   "source_url": "https://www.ncsc.gov.uk/section/about-this-website/terms-and-conditions",
+   "source_name": "NCSC, términos"
+  },
+  {
+   "discipline": "security",
+   "maturity": "mature",
+   "claim": "Todo el contenido de cisa.gov es TLP:CLEAR y la agencia describe su sitio como de dominio público (obra del gobierno de EE. UU.).",
+   "source_url": "https://www.cisa.gov/linking-policy",
+   "source_name": "CISA, linking policy"
+  },
+  {
+   "discipline": "web-frontend",
+   "maturity": "mature",
+   "claim": "Para repositorios públicos, GitHub Actions da sin costo máquinas ubuntu-latest de 4 vCPU y 16 GB.",
+   "source_url": "https://github.blog/2024-01-17-github-hosted-runners-double-the-power-for-open-source/",
+   "source_name": "GitHub blog"
+  }
  ],
- "candidates": [],
+ "candidates": [
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "llama.cpp",
+   "kind": "tool",
+   "version": "b12374",
+   "license": "MIT",
+   "source": "https://github.com/ggml-org/llama.cpp/releases/tag/b12374",
+   "utility": "Ejecuta el modelo de lenguaje dentro de GitHub Actions para resumir y traducir las noticias gratis",
+   "install": "En el workflow: descargar llama-b12374-bin-ubuntu-x64.tar.gz del release oficial, verificar su SHA-256 y guardarlo en la caché de Actions. No se instala nada en la PC del fundador.",
+   "plain": "Un programa libre (llama.cpp) que corre dentro de GitHub, gratis, para que una IA abierta escriba el resumen de cada noticia en español y en inglés. No necesita cuentas, claves ni tarjeta",
+   "fallback": "Cada nota se abre dentro del sitio igual, pero con el extracto que manda el medio, sin traducir"
+  },
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "qwen3.5-4b-gguf",
+   "kind": "library",
+   "version": "e87f176479d0855a907a41277aca2f8ee7a09523",
+   "license": "Apache-2.0",
+   "source": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+   "utility": "Modelo que resume y traduce; se compara con Gemma 4 E4B y queda el mejor en español",
+   "install": "En el workflow: descargar Qwen3.5-4B-Q4_K_M.gguf fijado a ese commit, verificar SHA-256 y guardarlo en la caché de Actions.",
+   "plain": "El modelo de IA abierto (Qwen3.5 4B, 2,7 GB) que escribe los resúmenes; se prueba contra Gemma 4 y queda el que escriba mejor",
+   "fallback": "Usar solo Gemma 4 E4B, o el extracto del medio sin IA"
+  },
+  {
+   "permissions": [
+    "network-unrestricted"
+   ],
+   "cost": "0",
+   "trial": "",
+   "update": "Cambiar la versión fijada en el workflow y repetir la prueba de calidad",
+   "rollback": "Quitar el paso del workflow: el sitio vuelve a mostrar el extracto del medio",
+   "id": "gemma-4-e4b-gguf",
+   "kind": "library",
+   "version": "4ecc2ba63bcac23ba4a767fc87025b1450f84c9c",
+   "license": "Apache-2.0",
+   "source": "https://huggingface.co/google/gemma-4-E4B-it",
+   "utility": "Alternativa a Qwen3.5 para resumir y traducir en español",
+   "install": "En el workflow: descargar gemma-4-E4B-it-Q4_K_M.gguf fijado, verificar SHA-256 y guardarlo en la caché de Actions.",
+   "plain": "Segundo modelo abierto (Gemma 4 de Google) para comparar cuál resume mejor",
+   "fallback": "Usar solo Qwen3.5 4B"
+  }
+ ],
  "selection": {
   "herramientas": "Python sin dependencias para recolectar y generar; Playwright y axe-core, ya instalados, para el control",
   "criterio": "Costo 0. Sin terceros en el sitio publicado. Datos de fuentes oficiales"
  },
  "learnings": [
   "Ciber Radar: FIRST EPSS responde 400 si el pedido prioriza XML en Accept; hay que pedir application/json.",
-  "Ciber Radar: de Google Noticias solo entran medios de la lista [trusted] de feeds.toml, comparando el dominio del <source url>."
+  "Ciber Radar: de Google Noticias solo entran medios de la lista [trusted] de feeds.toml, comparando el dominio del <source url>.",
+  "Copiar notas enteras de medios privados infringe derechos de autor aunque se retiren al primer reclamo: se publica un resumen propio, y texto completo solo de CISA (dominio público) y NCSC (OGL v3).",
+  "Las notas de Google Noticias traen un enlace cifrado: sin decodificarlo no hay imagen ni texto de la nota original."
  ],
  "open_questions": [
   "Búsqueda de la marca 'Ciber Radar' en INPI y OMPI antes de registrar dominio o marca.",
