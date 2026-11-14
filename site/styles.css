@@ -488,3 +488,56 @@ svg { flex: none; }
 :root[data-theme="dark"] :is(.sections, .lang-switch, .motto) { font-weight: 640; }
 :root[data-theme="dark"] :is(.meta, .wire-meta, .bars, .summary) { font-weight: 380; }
 @media (max-width: 680px) { .foot-logo { font-size: 3.2rem; } .foot-brand { column-gap: 16px; } }
+
+/* Nota dentro del sitio: texto a la izquierda, ficha de la fuente a la derecha, similares abajo. */
+.note-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 64px; align-items: start; padding-top: 22px; }
+.note { max-width: 46rem; }
+.back {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 0;
+  font: 700 1rem/1 var(--display); font-stretch: 80%; text-transform: uppercase; letter-spacing: .02em;
+}
+.back span { font-size: 1.25rem; transition: translate .2s var(--ease); }
+@media (hover: hover) { .back:hover span { translate: -4px 0; } }
+.note-kicker { margin: 14px 0 10px; font: 700 .875rem/1.3 var(--display); font-stretch: 84%; text-transform: uppercase; letter-spacing: .03em; color: var(--ink-2); }
+.note h1 {
+  margin: 0 0 16px;
+  font: 760 clamp(2.25rem, 4.4vw, 3.5rem)/1.04 var(--display);
+  font-stretch: 70%; letter-spacing: -.005em;
+}
+.note-dek { margin: 0 0 16px; font-size: 1.25rem; line-height: 1.5; color: var(--ink); }
+.note-meta { margin: 0 0 22px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); font: 500 .9375rem/1.4 var(--display); color: var(--muted); }
+.note-meta a { color: var(--ink); font-weight: 700; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--rule); }
+@media (hover: hover) { .note-meta a:hover { text-decoration-color: currentColor; } }
+.note-figure { margin: 0 0 24px; }
+.note-figure img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; background: var(--rule); }
+.note-figure figcaption { margin-top: 8px; font: 500 .8125rem/1.4 var(--display); color: var(--muted); }
+.note-body { font-size: 1.1875rem; line-height: 1.68; }
+.note-body p { margin: 0 0 1.1em; }
+.note-body h2 { margin: 1.6em 0 .5em; font: 800 1.375rem/1.2 var(--display); font-stretch: 78%; }
+.note-body .li { position: relative; margin: 0 0 .5em; padding-left: 1.2em; }
+.note-body .li::before { content: ""; position: absolute; left: .2em; top: .7em; width: .4em; height: 2px; background: var(--ink); }
+.note-kind { margin: 26px 0 0; padding-top: 12px; border-top: 2px solid var(--rule); font: 500 .875rem/1.5 var(--display); color: var(--muted); }
+.note-source { position: sticky; top: 20px; padding: 18px 0 0; border-top: 5px solid var(--ink); }
+.note-source h2 { margin: 0 0 12px; font: 800 1.125rem/1.2 var(--display); font-stretch: 72%; text-transform: uppercase; letter-spacing: .01em; word-spacing: .14em; }
+.note-source dl { margin: 0; }
+.note-source dl div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font: 500 .9375rem/1.4 var(--display); }
+.note-source dt { color: var(--muted); }
+.note-source dd { margin: 0; color: var(--ink); font-weight: 600; }
+.note-out {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; min-height: 52px; padding: 0 18px;
+  background: var(--ink); color: var(--bg); font: 700 1.0625rem/1.2 var(--display); font-stretch: 84%;
+  transition: background-color .2s var(--ease);
+}
+.note-out span { font-size: 1.375rem; transition: translate .2s var(--ease); }
+@media (hover: hover) { .note-out:hover span { translate: 3px -3px; } }
+.related { margin-top: 48px; }
+@media (max-width: 1024px) {
+  .note-wrap { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .note { max-width: none; }
+  .note-source { position: static; max-width: 46rem; }
+}
+@media (max-width: 680px) {
+  .note-wrap { padding-top: 10px; }
+  .note-body { font-size: 1.125rem; }
+  .note-source dl div { grid-template-columns: 8rem minmax(0, 1fr); }
+}

@@ -4,6 +4,8 @@
 # require_cyber: true descarta las notas que no hablan de ciberseguridad
 # title_prefix:  solo acepta títulos con ese prefijo y lo quita
 # lang:          idioma de los títulos, si no es español
+# reuse:         licencia que permite republicar el texto completo (solo organismos públicos con licencia
+#                abierta). Sin reuse, del medio se muestra el extracto de su feed, nunca la nota entera.
 # aggregator:    true marca un agregador. Las fuentes directas van antes para ganar los duplicados.
 #                De un agregador solo entran notas de los medios de [trusted].
 
@@ -56,6 +58,7 @@ name = "CISA"
 kind = "oficial"
 lang = "en"
 url = "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+reuse = "Dominio público: obra del gobierno de EE. UU. (TLP:CLEAR)."
 region = "mundo"
 
 [[feeds]]
@@ -113,6 +116,7 @@ name = "NCSC (Reino Unido)"
 kind = "oficial"
 lang = "en"
 url = "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml"
+reuse = "Contiene información del sector público con licencia Open Government Licence v3.0."
 region = "mundo"
 
 [[feeds]]
@@ -230,3 +234,15 @@ critical = [
 "Vulnerabilidades" = ["vulnerabilidad*", "vulnerabilit*", "zero-day", "zero day", "dia cero", "cve-*", "parche*", "patch*", "exploit*", "advisory", "aviso de seguridad"]
 "Malware" = ["malware", "troyano*", "backdoor*", "botnet*", "spyware", "stealer*", "trojan*"]
 "Estado y defensa" = ["ciberdefensa", "ciberpatrullaje", "gobierno", "ministerio", "government", "nation-state", "espionaje", "cyberespionage", "ciberespionaje"]
+
+# Notas o fuentes retiradas, por ejemplo a pedido de un medio. Se quitan del sitio y de los datos en la
+# próxima edición (cada 30 minutos, o al instante con una corrida manual del workflow).
+#   ids:     el código de la nota (la parte final de /nota/<código>)
+#   urls:    el enlace original de la nota
+#   sources: el nombre del medio, tal como aparece en el sitio
+#   domains: el dominio del medio, con sus subdominios
+[removed]
+ids = []
+urls = []
+sources = []
+domains = []

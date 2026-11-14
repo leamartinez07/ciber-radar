@@ -36,7 +36,16 @@ class RenderTests(unittest.TestCase):
         items.append(item(30, id="evil", title=ATTACK, source=ATTACK, summary=ATTACK, alert=True,
                           published="2026-11-10T09:00:00+00:00"))
         items.append(item(31, id="badlink", url="javascript:alert(3)", title="Enlace peligroso de prueba"))
-        items.append(item(32, id="english", lang="en", title="Critical bug exploited in the wild today"))
+        items.append(item(32, id="english", lang="en", title="Critical bug exploited in the wild today",
+                          image="https://img.test/foto.jpg"))
+        items.append(item(33, id="traducida", lang="en", title="Original English headline about ransomware gangs",
+                          tr={"es": {"title": "Título traducido sobre bandas de ransomware", "summary": "Bajada traducida.",
+                                     "body": ["Primer párrafo del resumen propio.", "Segundo párrafo."]},
+                              "en": {"title": "Ransomware gangs, in our own words", "summary": "Our dek.",
+                                     "body": ["First paragraph of our summary."]}}))
+        items.append(item(34, id="oficial", source="CISA", lang="en", title="Agency adds two exploited flaws to catalog",
+                          body=[["h", "Subtítulo oficial"], ["p", "Texto completo del aviso oficial."], ["li", "CVE-2026-1"]],
+                          reuse="Dominio público: obra del gobierno de EE. UU."))
         items.sort(key=lambda i: i["published"], reverse=True)
         (data / "2026-11.json").write_text(json.dumps(items), encoding="utf-8")
         latest = {
@@ -110,6 +119,53 @@ class RenderTests(unittest.TestCase):
             page = path.read_text(encoding="utf-8")
             self.assertNotRegex(page, r"<script(?![^>]*(?:src=|application/ld\+json))")
             self.assertNotRegex(page, r"<style|\sstyle=|\son[a-z]+=\"")
+
+    def note(self, path):
+        return (self.out / f"{path}.html").read_text(encoding="utf-8")
+
+    def test_titles_open_the_note_inside_the_site(self):
+        self.assertIn('href="/nota/id1"', (self.out / "argentina.html").read_text(encoding="utf-8"))
+        self.assertIn('href="/en/news/id1"', (self.out / "en/argentina.html").read_text(encoding="utf-8"))
+        self.assertTrue((self.out / "nota/id1.html").is_file())
+        self.assertTrue((self.out / "en/news/id1.html").is_file())
+
+    def test_note_has_source_link_back_and_related(self):
+        page = self.note("nota/english")
+        self.assertIn("data-back", page)
+        self.assertIn('class="note-out" href="https://a.test/32" target="_blank" rel="noopener noreferrer"', page)
+        self.assertIn("De dónde es esta noticia", page)
+        self.assertIn('src="https://img.test/foto.jpg" alt="" referrerpolicy="no-referrer"', page)
+        self.assertIn("Imagen: Fuente", page)
+        self.assertIn('href="/en/news/english"', page)  # el cambio de idioma lleva a la misma nota
+        self.assertIn("Notas similares", page)
+
+    def test_note_with_only_the_outlet_excerpt_is_not_indexed(self):
+        page = self.note("nota/id1")
+        self.assertIn('content="noindex,follow"', page)
+        self.assertIn("Extracto publicado por Fuente", page)
+        self.assertNotIn("/nota/id1<", (self.out / "sitemap.xml").read_text(encoding="utf-8"))
+
+    def test_translation_is_shown_in_each_language(self):
+        self.assertIn("Título traducido sobre bandas de ransomware", (self.out / "argentina.html").read_text(encoding="utf-8"))
+        es, en = self.note("nota/traducida"), self.note("en/news/traducida")
+        self.assertIn("Primer párrafo del resumen propio.", es)
+        self.assertIn("Resumen escrito por Ciber Radar", es)
+        self.assertIn("First paragraph of our summary.", en)
+        self.assertIn('content="index,follow', es)
+        self.assertIn("/nota/traducida<", (self.out / "sitemap.xml").read_text(encoding="utf-8"))
+
+    def test_licensed_full_text(self):
+        page = self.note("nota/oficial")
+        self.assertIn("<h2>Subtítulo oficial</h2>", page)
+        self.assertIn('<p class="li">CVE-2026-1</p>', page)
+        self.assertIn("Texto completo publicado por CISA. Dominio público", page)
+
+    def test_search_index_is_light(self):
+        index = {i["id"]: i for i in json.loads((self.out / "data/latest.json").read_text(encoding="utf-8"))["items"]}
+        self.assertEqual(index["id1"]["p"], 1)
+        self.assertNotIn("body", index["oficial"])
+        self.assertNotIn("body", index["traducida"]["tr"]["es"])
+        self.assertEqual(index["traducida"]["tr"]["es"]["title"], "Título traducido sobre bandas de ransomware")
 
     def test_foreign_titles_are_marked(self):
         self.assertIn('<h3 lang="en">', (self.out / "argentina.html").read_text(encoding="utf-8"))

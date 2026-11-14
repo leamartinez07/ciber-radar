@@ -25,6 +25,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from collect import norm, safe_url, title_words  # noqa: E402
+from enrich import NOTE_DAYS, is_removed, removed_rules  # noqa: E402
 
 AR = dt.timezone(dt.timedelta(hours=-3))
 CRITICAL_TOPICS = {"Vulnerabilidades", "Ransomware", "Filtraciones"}
@@ -106,6 +107,16 @@ LANGS = {
         "no_vulns": "No hay datos de vulnerabilidades por ahora.",
         "vuln_filter": "Filtrar vulnerabilidades", "vuln_filter_ph": "Filtrar por CVE, fabricante o producto…",
         "vuln_none": "Ninguna vulnerabilidad coincide con el filtro.",
+        "back": "Volver", "source_box": "De dónde es esta noticia", "outlet": "Medio", "kind": "Tipo de fuente",
+        "region": "Región", "topic": "Tema", "published": "Publicada", "original_lang": "Idioma original",
+        "lang_names": {"es": "Español", "en": "Inglés"}, "read_at": "Leer en {source}",
+        "read_at_label": "Leer la nota original en {source} (se abre en otra pestaña)",
+        "image_credit": "Imagen: {source}", "similar": "Notas similares",
+        "text_full": "Texto completo publicado por {source}. {reuse}",
+        "text_summary": "Resumen escrito por Ciber Radar a partir de la nota de {source}.",
+        "text_excerpt": "Extracto publicado por {source}. La nota completa está en su sitio.",
+        "text_none": "{source} no comparte un extracto de esta nota: la nota completa está en su sitio.",
+        "note_title": "{title} | {site}",
         "sec": {
             "ar": ("argentina", "Argentina", "Ciberataques, filtraciones de datos, estafas digitales y ciberdefensa en Argentina, actualizado cada 30 minutos."),
             "latam": ("latinoamerica", "Latinoamérica", "Noticias de ciberseguridad de América Latina: amenazas, incidentes y análisis regionales."),
@@ -113,6 +124,7 @@ LANGS = {
             "alert": ("alertas", "Alertas", "Incidentes en Argentina y fallos críticos que ya se están explotando en el mundo."),
             "vulns": ("vulnerabilidades", "Vulnerabilidades", ""),
             "archive": ("archivo", "Archivo", ""),
+            "note": ("nota", "Nota", ""),
             "notfound": ("404", "Página no encontrada", ""),
         },
     },
@@ -183,6 +195,16 @@ LANGS = {
         "no_vulns": "No vulnerability data right now.",
         "vuln_filter": "Filter vulnerabilities", "vuln_filter_ph": "Filter by CVE, vendor or product…",
         "vuln_none": "No vulnerability matches the filter.",
+        "back": "Back", "source_box": "Where this story comes from", "outlet": "Outlet", "kind": "Source type",
+        "region": "Region", "topic": "Topic", "published": "Published", "original_lang": "Original language",
+        "lang_names": {"es": "Spanish", "en": "English"}, "read_at": "Read on {source}",
+        "read_at_label": "Read the original story on {source} (opens in a new tab)",
+        "image_credit": "Image: {source}", "similar": "Related stories",
+        "text_full": "Full text published by {source}. {reuse}",
+        "text_summary": "Summary written by Ciber Radar from the story by {source}.",
+        "text_excerpt": "Excerpt published by {source}. The full story is on their site.",
+        "text_none": "{source} does not share an excerpt of this story: the full story is on their site.",
+        "note_title": "{title} | {site}",
         "sec": {
             "ar": ("argentina", "Argentina", "Cyberattacks, data breaches, online scams and cyber defense in Argentina, updated every 30 minutes."),
             "latam": ("latin-america", "Latin America", "Cybersecurity news from Latin America: threats, incidents and regional analysis."),
@@ -190,6 +212,7 @@ LANGS = {
             "alert": ("alerts", "Alerts", "Incidents in Argentina and critical flaws already being exploited around the world."),
             "vulns": ("vulnerabilities", "Vulnerabilities", ""),
             "archive": ("archive", "Archive", ""),
+            "note": ("news", "Story", ""),
             "notfound": ("404", "Page not found", ""),
         },
     },
@@ -249,10 +272,13 @@ COUNTRY_PATTERNS = {
 TRUST_ORDER = ["oficial", "investigacion", "especializado", "prensa"]
 
 
+def feeds_config() -> dict:
+    return tomllib.loads((Path(__file__).resolve().parent.parent / "feeds.toml").read_text(encoding="utf-8"))
+
+
 def source_kinds() -> dict[str, str]:
     """Tipo de cada fuente directa, según feeds.toml. Lo que llega por un agregador es prensa general."""
-    config = tomllib.loads((Path(__file__).resolve().parent.parent / "feeds.toml").read_text(encoding="utf-8"))
-    return {f["name"]: f.get("kind", "especializado") for f in config["feeds"] if not f.get("aggregator")}
+    return {f["name"]: f.get("kind", "especializado") for f in feeds_config()["feeds"] if not f.get("aggregator")}
 
 
 # Marca LM de Leandro Martinez, la misma del portfolio.
@@ -342,19 +368,42 @@ class Lang:
         return self.category(item["category"]) if item["category"] != "General" else self.t["regions"][item["region"]]
 
 
+def localized(lang: Lang, item: dict) -> tuple[str, str, str]:
+    """Título, bajada e idioma en que se muestran: la traducción al idioma de la página si existe, o el original."""
+    own = (item.get("tr") or {}).get(lang.code) or {}
+    if own.get("title"):
+        return own["title"], own.get("summary", ""), lang.code
+    return item["title"], item["summary"], item.get("lang", "es")
+
+
+def lang_attr(lang: Lang, code: str) -> str:
+    return f' lang="{esc(code)}"' if code != lang.code else ""
+
+
+def note_path(lang: Lang, item: dict) -> str:
+    return lang.path("note", "/" + item["id"])
+
+
+def link(lang: Lang, item: dict) -> str:
+    """Atributos del enlace de un titular: a la página de la nota dentro del sitio, o al medio si no tiene."""
+    if item.get("_page"):
+        return f'href="{esc(note_path(lang, item))}"'
+    return f'href="{esc(safe_url(item["url"]))}" target="_blank" rel="noopener noreferrer"'
+
+
 def story(lang: Lang, item: dict, heading: str = "h3", summary: bool = True, css: str = "story", flag: bool = True) -> str:
     url = safe_url(item["url"])
     if not url:
         return ""
-    item_lang = item.get("lang", "es")
-    attr = f' lang="{esc(item_lang)}"' if item_lang != lang.code else ""
+    title, dek, shown = localized(lang, item)
+    attr = lang_attr(lang, shown)
     # Tema y alerta van en la línea de datos, debajo del título: el titular no lleva etiqueta encima.
     # En la columna de alertas la marca sobra: ahí todas lo son.
     mark = f'<span class="flag">{esc(lang["alert"])}</span> ' if item["alert"] and flag else ""
-    body = f'<p class="summary"{attr}>{esc(item["summary"])}</p>' if summary and item["summary"] else ""
+    body = f'<p class="summary"{attr}>{esc(dek)}</p>' if summary and dek else ""
     return (
         f'<article class="{css}" data-category="{esc(item["category"])}" data-seen="{esc(item["first_seen"])}">'
-        f'<{heading}{attr}><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["title"])}</a></{heading}>'
+        f'<{heading}{attr}><a {link(lang, item)}>{esc(title)}</a></{heading}>'
         f'{body}<p class="meta">{mark}<span class="subject">{esc(lang.topic(item))}</span> · {esc(item["source"])} '
         f'<span class="when">· {lang.time_tag(item["published"])}</span></p></article>'
     )
@@ -531,15 +580,36 @@ class Site:
         self.data_dir, self.source, self.out = data_dir, source, out
         self.url = site_url.rstrip("/")
         self.latest = json.loads((data_dir / "latest.json").read_text(encoding="utf-8"))
-        self.items = [i for i in self.latest["items"] if safe_url(i["url"])]
+        self.removed = removed_rules(feeds_config())
         self.months = self.latest["months"]
         self.generated = self.latest["generated"]
         self.now = dt.datetime.fromisoformat(self.generated)
+        # Notas con página propia: las de los últimos NOTE_DAYS días. Las más viejas enlazan al medio.
+        since = (self.now - dt.timedelta(days=NOTE_DAYS)).isoformat(timespec="seconds")
+        self.notes: dict[str, dict] = {}
+        self.items = self.usable(self.latest["items"])
+        for i in self.items + [i for month in self.months for i in self.month_items(month)]:
+            if i["published"] >= since:
+                self.notes.setdefault(i["id"], i)
+        for i in self.items + list(self.notes.values()):
+            i["_page"] = i["id"] in self.notes
         self.year = self.now.astimezone(AR).year
         vulns_path = data_dir / "vulns.json"
         self.vulns = json.loads(vulns_path.read_text(encoding="utf-8")) if vulns_path.is_file() else {}
         self.assets: dict[str, str] = {}
         self.pages: list[tuple[str, dict[str, str]]] = []
+
+    def usable(self, items: list[dict]) -> list[dict]:
+        """Sin enlaces inseguros ni notas retiradas; marca las que tienen página propia."""
+        kept = [i for i in items if safe_url(i["url"]) and not is_removed(i, self.removed)]
+        for i in kept:
+            i["_page"] = i["id"] in self.notes
+        return kept
+
+    def month_items(self, month: str) -> list[dict]:
+        path = self.data_dir / f"{month}.json"
+        items = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else []
+        return self.usable(items)
 
     def write(self, relative: str, content: str | bytes) -> None:
         path = self.out / relative
@@ -575,11 +645,11 @@ class Site:
         chart = pulse(lang, self.items, self.now)
         if not latest:
             return f'<aside class="wire" aria-label="{esc(lang["activity"])}">{chart}</aside>'
-        attr = f' lang="{esc(latest.get("lang", "es"))}"' if latest.get("lang", "es") != lang.code else ""
+        title, _, shown = localized(lang, latest)
         return (
             f'<aside class="wire" aria-label="{esc(lang["last_alert_label"])}"><div class="wire-news">'
             f'<span class="wire-label"><span class="pulse" aria-hidden="true"></span>{esc(lang["latest_alert"])}</span>'
-            f'<a{attr} href="{esc(safe_url(latest["url"]))}" target="_blank" rel="noopener noreferrer">{esc(latest["title"])}</a>'
+            f'<a{lang_attr(lang, shown)} {link(lang, latest)}>{esc(title)}</a>'
             f'<span class="wire-meta">{lang.time_tag(latest["published"])}</span></div>{chart}</aside>'
         )
 
@@ -630,7 +700,8 @@ class Site:
 
     def page(self, lang: Lang, key: str, title: str, description: str, content: str, *,
              extra: str = "", items: list[dict] | None = None, heading: str | None = None,
-             extra_ld: list[dict] | None = None, indexable: bool = True, search: bool = True) -> None:
+             extra_ld: list[dict] | None = None, indexable: bool = True, search: bool = True,
+             og_type: str = "website") -> None:
         """key identifica la página en ambos idiomas; extra agrega un sufijo, como el mes del archivo."""
         path = lang.path(key, extra)
         alternates = {code: Lang(code).path(key, extra) for code in LANGS}
@@ -645,7 +716,8 @@ class Site:
                    "inLanguage": lang["html"], "description": lang["home_description"], "author": owner, "publisher": owner,
                    "copyrightHolder": owner, "copyrightYear": self.year}
         ld = "".join(json_ld(d) for d in [website, *(extra_ld or [])])
-        robots = "index,follow,max-image-preview:large,max-snippet:-1" if indexable else "noindex"
+        robots = "index,follow,max-image-preview:large,max-snippet:-1" if indexable else "noindex,follow"
+        switch = other.path(key, extra) if indexable or key == "note" else other.path()
         hreflang = "".join(
             f'<link rel="alternate" hreflang="{LANGS[code]["html"]}" href="{esc(self.absolute(p))}">' for code, p in alternates.items()
         ) + f'<link rel="alternate" hreflang="x-default" href="{esc(self.absolute(alternates["es"]))}">'
@@ -664,7 +736,7 @@ class Site:
 <meta name="theme-color" content="#ffffff">
 <meta name="author" content="{OWNER}">
 <meta name="copyright" content="© {self.year} {OWNER}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{og_type}">
 <meta property="og:site_name" content="{SITE_NAME}">
 <meta property="og:locale" content="{lang["og"]}">
 <meta property="og:title" content="{esc(title)}">
@@ -689,7 +761,7 @@ class Site:
 <body>
 <a class="skip" href="#contenido">{esc(lang["skip"])}</a>
 <header>
-<div class="topbar"><span class="date">{esc(lang["today_label"])} <span id="today">{esc(lang.day(self.now.astimezone(AR).date()))}</span></span><div class="topbar-right">{self.status_line(lang)}<a class="lang-switch" href="{other.path(key, extra) if indexable else other.path()}" hreflang="{other["html"]}" lang="{other["html"]}" aria-label="{esc(lang["lang_switch_label"])}">{esc(lang["lang_switch"])}</a><button class="theme-toggle" type="button" id="theme" aria-label="{esc(lang["theme"])}">{THEME_ICONS}</button></div></div>
+<div class="topbar"><span class="date">{esc(lang["today_label"])} <span id="today">{esc(lang.day(self.now.astimezone(AR).date()))}</span></span><div class="topbar-right">{self.status_line(lang)}<a class="lang-switch" href="{switch}" hreflang="{other["html"]}" lang="{other["html"]}" aria-label="{esc(lang["lang_switch_label"])}">{esc(lang["lang_switch"])}</a><button class="theme-toggle" type="button" id="theme" aria-label="{esc(lang["theme"])}">{THEME_ICONS}</button></div></div>
 <div class="masthead">
 <{brand_tag} class="brand" translate="no">{brand}</{brand_tag}>
 <p class="motto">{esc(lang["masthead_sub"])}</p>
@@ -789,8 +861,7 @@ class Site:
             items = found[code][:5]
             heading = lang["country_news"].format(name=COUNTRIES[code][name], n=n, unit=lang["note_count"][0 if n == 1 else 1])
             rows = "".join(
-                f'<li><a href="{esc(safe_url(i["url"]))}" target="_blank" rel="noopener noreferrer"'
-                f'{f' lang="{esc(i.get("lang", "es"))}"' if i.get("lang", "es") != lang.code else ""}>{esc(i["title"])}</a>'
+                f'<li><a {link(lang, i)}{lang_attr(lang, localized(lang, i)[2])}>{esc(localized(lang, i)[0])}</a>'
                 f'<span class="meta">{esc(i["source"])} <span class="when">· {lang.time_tag(i["published"])}</span></span></li>'
                 for i in items
             )
@@ -920,6 +991,93 @@ class Site:
             self.page(lang, key, title, lang.description(key), content, items=shown, heading=lang.name(key),
                       extra_ld=[self.item_list(lang, title, shown, lang.path(key))])
 
+    def similar(self, item: dict, pool: list[dict], count: int = 4) -> list[dict]:
+        """Notas parecidas: palabras del título en común, mismo tema y misma región, de las más cercanas en fecha."""
+        def words(i: dict) -> set[str]:
+            texts = [i["title"]] + [t.get("title", "") for t in (i.get("tr") or {}).values()]
+            return {w for t in texts for w in title_words(t)}
+        mine = words(item)
+        when = dt.datetime.fromisoformat(item["published"])
+        scored = []
+        for other in pool:
+            if other["id"] == item["id"]:
+                continue
+            theirs = words(other)
+            score = len(mine & theirs) / len(mine | theirs) if mine and theirs else 0
+            score += .15 if other["category"] == item["category"] != "General" else 0
+            score += .05 if other["region"] == item["region"] else 0
+            days = abs((dt.datetime.fromisoformat(other["published"]) - when).total_seconds()) / 86400
+            scored.append((score - min(days, 30) * .003, other))
+        scored.sort(key=lambda s: s[0], reverse=True)
+        return [o for s, o in scored[:count] if s > .1]
+
+    def note_body(self, lang: Lang, item: dict) -> tuple[str, str, bool]:
+        """Cuerpo de la nota, la aclaración de qué texto es y si la página aporta algo propio (para indexarla)."""
+        source = item["source"]
+        own = (item.get("tr") or {}).get(lang.code) or {}
+        if own.get("body"):
+            paragraphs = "".join(f"<p>{esc(p)}</p>" for p in own["body"])
+            return f'<div class="note-body">{paragraphs}</div>', lang["text_summary"].format(source=source), True
+        if item.get("body"):
+            tags = {"h": ("<h2>", "</h2>"), "li": ('<p class="li">', "</p>")}
+            blocks = "".join(f'{tags.get(k, ("<p>", "</p>"))[0]}{esc(t)}{tags.get(k, ("<p>", "</p>"))[1]}' for k, t in item["body"])
+            return (f'<div class="note-body"{lang_attr(lang, item.get("lang", "es"))}>{blocks}</div>',
+                    lang["text_full"].format(source=source, reuse=item.get("reuse", "")), True)
+        excerpt = item.get("excerpt") or item["summary"]
+        if excerpt:
+            return (f'<div class="note-body"{lang_attr(lang, item.get("lang", "es"))}><p>{esc(excerpt)}</p></div>',
+                    lang["text_excerpt"].format(source=source), False)
+        return "", lang["text_none"].format(source=source), False
+
+    def build_notes(self, lang: Lang) -> None:
+        kinds = source_kinds()
+        pool = sorted(self.notes.values(), key=lambda i: i["published"], reverse=True)
+        for item in pool:
+            url = safe_url(item["url"])
+            title, dek, shown = localized(lang, item)
+            when = local(item["published"])
+            stamp = f'{lang.day(when.date())}, {when:%H:%M}'
+            body, kind_note, own = self.note_body(lang, item)
+            section = "alert" if item["alert"] else item["region"]
+            mark = f'<span class="flag">{esc(lang["alert"])}</span> · ' if item["alert"] else ""
+            topic = lang.category(item["category"]) if item["category"] != "General" else ""
+            kicker = " · ".join(filter(None, [esc(topic), esc(lang["regions"][item["region"]])]))
+            image = safe_url(item.get("image", ""))
+            figure = (f'<figure class="note-figure"><img src="{esc(image)}" alt="" referrerpolicy="no-referrer" '
+                      f'decoding="async" fetchpriority="high"><figcaption>{esc(lang["image_credit"].format(source=item["source"]))}'
+                      '</figcaption></figure>') if image.startswith("https://") else ""
+            out = (f'<a class="note-out" href="{esc(url)}" target="_blank" rel="noopener noreferrer" '
+                   f'aria-label="{esc(lang["read_at_label"].format(source=item["source"]))}">'
+                   f'{esc(lang["read_at"].format(source=item["source"]))} <span aria-hidden="true">↗</span></a>')
+            facts = [
+                (lang["outlet"], esc(item["source"])),
+                (lang["kind"], esc(lang["trust_kinds"][kinds.get(item["source"], "prensa")])),
+                (lang["published"], f'<time datetime="{esc(item["published"])}">{esc(stamp)}</time>'),
+                (lang["region"], esc(lang["regions"][item["region"]])),
+                (lang["topic"], esc(lang.category(item["category"]))),
+                (lang["original_lang"], esc(lang["lang_names"].get(item.get("lang", "es"), item.get("lang", "es")))),
+            ]
+            facts_html = "".join(f"<div><dt>{esc(k)}</dt><dd>{v}</dd></div>" for k, v in facts)
+            related = self.similar(item, pool)
+            related_html = (
+                f'<section class="block related" aria-labelledby="related-title">{self.block_head(lang["similar"], "related-title")}'
+                f'<div class="block-grid">{"".join(story(lang, i) for i in related)}</div></section>'
+            ) if related else ""
+            content = (
+                f'<div class="note-wrap"><article class="note">'
+                f'<a class="back" href="{lang.path(section)}" data-back><span aria-hidden="true">←</span> {esc(lang["back"])}</a>'
+                f'<p class="note-kicker">{mark}{kicker}</p>'
+                f'<h1{lang_attr(lang, shown)}>{esc(title)}</h1>'
+                + (f'<p class="note-dek"{lang_attr(lang, shown)}>{esc(dek)}</p>' if dek and own and shown == lang.code else "")
+                + f'<p class="note-meta"><a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(item["source"])} '
+                f'<span aria-hidden="true">↗</span></a> · <time datetime="{esc(item["published"])}">{esc(stamp)}</time></p>'
+                f'{figure}{body}<p class="note-kind">{esc(kind_note)}</p>'
+                f'</article><aside class="note-source" aria-labelledby="source-title"><h2 id="source-title">{esc(lang["source_box"])}</h2>'
+                f'<dl>{facts_html}</dl>{out}</aside></div>{related_html}'
+            )
+            self.page(lang, "note", lang["note_title"].format(title=title, site=SITE_NAME), dek or title, content,
+                      extra="/" + item["id"], items=[], indexable=own, search=False, og_type="article")
+
     def build_vulns(self, lang: Lang) -> None:
         kev, critical = self.vulns.get("kev", []), self.vulns.get("critical", [])
         if not kev and not critical:
@@ -947,8 +1105,7 @@ class Site:
     def build_archive(self, lang: Lang) -> None:
         rows = []
         for month in self.months:
-            items = json.loads((self.data_dir / f"{month}.json").read_text(encoding="utf-8"))
-            items = [i for i in items if safe_url(i["url"])]
+            items = self.month_items(month)
             name = lang.month_name(month)
             rows.append(f'<li><a href="{lang.path("archive", "/" + month)}">{esc(name)}</a><span>{len(items)} {esc(lang["notes"])}</span></li>')
             self.page(lang, "archive", f'{lang["archive_month_title"].format(name=name)} | {SITE_NAME}',
@@ -1015,7 +1172,17 @@ class Site:
                 shutil.copy2(page, self.out / page.name)
         for name in ("og.png", "manifest.webmanifest", "favicon.ico"):
             shutil.copy2(self.source / name, self.out / name)
-        self.write("data/latest.json", json.dumps({"items": self.items}, ensure_ascii=False, separators=(",", ":")))
+        # El índice del buscador lleva solo lo que muestra una ficha; p marca las notas con página propia.
+        fields = ("id", "title", "url", "source", "summary", "region", "category", "alert", "published", "lang")
+        index = []
+        for i in self.items:
+            entry = {k: i[k] for k in fields if k in i}
+            if i.get("tr"):
+                entry["tr"] = {c: {k: v for k, v in t.items() if k != "body"} for c, t in i["tr"].items()}
+            if i.get("_page"):
+                entry["p"] = 1
+            index.append(entry)
+        self.write("data/latest.json", json.dumps({"items": index}, ensure_ascii=False, separators=(",", ":")))
         precache = ["/", "/en", self.assets["styles.css"], self.assets["app.js"], self.assets["theme.js"],
                     "/data/latest.json", "/icons/rr-192.png"]
         precache += sorted(f"/fonts/{p.name}" for p in (self.source / "fonts").glob("*.woff2"))
@@ -1035,6 +1202,7 @@ class Site:
             self.build_sections(lang)
             self.build_vulns(lang)
             self.build_archive(lang)
+            self.build_notes(lang)
         self.build_404()
         self.build_feed()
         self.build_discovery()

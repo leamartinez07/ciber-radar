@@ -29,6 +29,10 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python3 collector/collect.py
 
+      # Imagen de cada nota y texto completo de las fuentes con licencia abierta. Si falla, se publica igual.
+      - name: Completar las notas
+        run: python3 collector/enrich.py || echo "::warning::notas sin completar"
+
       - name: Vulnerabilidades (CISA KEV, EPSS, NVD)
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}

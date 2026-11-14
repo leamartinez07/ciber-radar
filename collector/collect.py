@@ -31,6 +31,7 @@ USER_AGENT = "Mozilla/5.0 (compatible; CiberRadar/1.0; lector de RSS)"
 MAX_FEED_BYTES = 12 * 1024 * 1024
 TITLE_MAX = 240
 SUMMARY_MAX = 240
+EXCERPT_MAX = 700
 TRACKING_PARAMS = ("utm_", "fbclid", "gclid", "mc_cid", "mc_eid")
 MIN_HEALTHY_RATIO = 0.5
 SAME_STORY_RATIO = 0.5
@@ -226,7 +227,9 @@ def build_item(feed: dict, entry: dict, now: dt.datetime, rules: Rules) -> dict 
         title = title[: -len(suffix)].rstrip()
 
     # Google Noticias solo repite el título y enlaces en la descripción.
-    summary = "" if feed.get("aggregator") else truncate(clean_text(entry["summary"]), SUMMARY_MAX)
+    feed_text = "" if feed.get("aggregator") else clean_text(entry["summary"])
+    summary = truncate(feed_text, SUMMARY_MAX)
+    excerpt = truncate(feed_text, EXCERPT_MAX)  # lo que el medio comparte en su feed, para la página de la nota
     title = truncate(title, TITLE_MAX)
 
     n_title = norm(title)
@@ -240,7 +243,9 @@ def build_item(feed: dict, entry: dict, now: dt.datetime, rules: Rules) -> dict 
     published = parse_date(entry["date"], now)
     canon = canonical_url(url)
 
+    extra = {"excerpt": excerpt} if len(excerpt) > len(summary) else {}
     return {
+        **extra,
         "id": hashlib.sha256(canon.encode()).hexdigest()[:16],
         "title": title,
         "url": url,

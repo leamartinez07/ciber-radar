@@ -79,19 +79,35 @@ function markNew(lastVisit) {
   });
 }
 
+// Título y bajada en el idioma de la página si hay traducción; si no, los originales.
+function localized(item) {
+  const pageLang = EN ? "en" : "es";
+  const own = item.tr?.[pageLang];
+  if (own?.title) return { title: own.title, summary: own.summary || "", lang: pageLang };
+  return { title: item.title, summary: item.summary, lang: item.lang || "es" };
+}
+
 function storyNode(item) {
   const node = el("article", "story");
   const topic = item.category === "General" ? T.regions[item.region] : (T.categories[item.category] || item.category);
+  const shown = localized(item);
   const title = el("h3");
-  const link = el("a", "", item.title);
-  link.href = /^https?:\/\//i.test(item.url) ? item.url : "#";
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
+  const link = el("a", "", shown.title);
+  if (item.p && /^[a-f0-9]{16}$/.test(item.id)) {
+    link.href = EN ? `/en/news/${item.id}` : `/nota/${item.id}`;
+  } else {
+    link.href = /^https?:\/\//i.test(item.url) ? item.url : "#";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+  }
   title.append(link);
-  const pageLang = EN ? "en" : "es";
-  if (item.lang && item.lang !== pageLang) title.lang = item.lang;
+  if (shown.lang !== (EN ? "en" : "es")) title.lang = shown.lang;
   node.append(title);
-  if (item.summary) node.append(el("p", "summary", item.summary));
+  if (shown.summary) {
+    const summary = el("p", "summary", shown.summary);
+    if (title.lang) summary.lang = title.lang;
+    node.append(summary);
+  }
   const meta = el("p", "meta");
   if (item.alert) meta.append(el("span", "flag", T.alert), " ");
   meta.append(el("span", "subject", topic), ` · ${item.source} · ${relative(item.published) || shortDate.format(new Date(item.published))}`);
@@ -149,7 +165,8 @@ async function search(raw) {
   if (run !== searchRun) return;
   const found = items.filter((item) => {
     if (!inCurrentSection(item) || (topic && item.category !== topic)) return false;
-    const text = normalize(`${item.title} ${item.summary} ${item.source}`);
+    const shown = localized(item);
+    const text = normalize(`${item.title} ${item.summary} ${shown.title} ${shown.summary} ${item.source}`);
     return words.every((word) => text.includes(word));
   });
   const count = T.results(found.length);
@@ -290,6 +307,27 @@ function bindMap() {
   render();
 }
 
+// Volver: si se llegó desde el sitio, regresa a esa página en el mismo lugar; si no, va a la sección de la nota.
+function bindNote() {
+  const back = document.querySelector("[data-back]");
+  if (back) {
+    back.addEventListener("click", (event) => {
+      let fromSite = false;
+      try { fromSite = new URL(document.referrer).origin === location.origin; } catch { /* sin referencia */ }
+      if (fromSite && history.length > 1) {
+        event.preventDefault();
+        history.back();
+      }
+    });
+  }
+  // Una imagen del medio que ya no existe no deja un hueco: se quita la figura.
+  document.querySelectorAll(".note-figure img").forEach((img) => {
+    const drop = () => img.closest("figure")?.remove();
+    if (img.complete && img.naturalWidth === 0) drop();
+    else img.addEventListener("error", drop, { once: true });
+  });
+}
+
 function start() {
   markNew(storageGet("ciber-radar:last-visit"));
   storageSet("ciber-radar:last-visit", new Date().toISOString().slice(0, 19) + "+00:00");
@@ -298,6 +336,7 @@ function start() {
   bind();
   bindTheme();
   bindMap();
+  bindNote();
   revealCurrentSection();
   registerWorker();
 }
