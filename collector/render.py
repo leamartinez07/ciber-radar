@@ -678,8 +678,8 @@ class Site:
 <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="/feed.xml">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
-<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" href="/icons/rr-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/rr-apple-touch-icon.png">
 <link rel="preload" href="/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script src="{self.assets["theme.js"]}"></script>
 <link rel="stylesheet" href="{self.assets["styles.css"]}">
@@ -1017,7 +1017,7 @@ class Site:
             shutil.copy2(self.source / name, self.out / name)
         self.write("data/latest.json", json.dumps({"items": self.items}, ensure_ascii=False, separators=(",", ":")))
         precache = ["/", "/en", self.assets["styles.css"], self.assets["app.js"], self.assets["theme.js"],
-                    "/data/latest.json", "/icons/icon-192.png"]
+                    "/data/latest.json", "/icons/rr-192.png"]
         precache += sorted(f"/fonts/{p.name}" for p in (self.source / "fonts").glob("*.woff2"))
         version = hashlib.sha256("".join(precache).encode()).hexdigest()[:12]
         worker = (self.source / "sw.js").read_text(encoding="utf-8")

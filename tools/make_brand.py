@@ -64,14 +64,16 @@ def ico(png: bytes, size: int) -> bytes:
 
 
 async def render() -> None:
+    # Los nombres llevan "rr-": al cambiar el dibujo hay que cambiar el nombre, porque navegadores, el service
+    # worker y los sistemas que instalan la app guardan el ícono por su URL y no lo vuelven a pedir.
     from playwright.async_api import async_playwright
 
     ICONS.mkdir(parents=True, exist_ok=True)
     jobs = [
-        ("icon-192.png", icon_html(192), 192),
-        ("icon-512.png", icon_html(512), 512),
-        ("icon-maskable-512.png", icon_html(512, scale=.74), 512),
-        ("apple-touch-icon.png", icon_html(180, scale=.9), 180),
+        ("rr-192.png", icon_html(192), 192),
+        ("rr-512.png", icon_html(512), 512),
+        ("rr-maskable-512.png", icon_html(512, scale=.74), 512),
+        ("rr-apple-touch-icon.png", icon_html(180, scale=.9), 180),
         ("favicon-32.png", icon_html(32, scale=1.12), 32),
         ("og.png", og_html(), 0),
     ]
@@ -95,8 +97,8 @@ async def render() -> None:
                     (ICONS / name).write_bytes(data)
         await browser.close()
     # El ícono vectorial envuelve el PNG de 512: el dibujo depende de la fuente, que un SVG suelto no puede cargar.
-    encoded = base64.b64encode((ICONS / "icon-512.png").read_bytes()).decode("ascii")
-    (ICONS / "icon.svg").write_text(
+    encoded = base64.b64encode((ICONS / "rr-512.png").read_bytes()).decode("ascii")
+    (ICONS / "rr-icon.svg").write_text(
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><image width="512" height="512" href="data:image/png;base64,{encoded}"/></svg>\n',
         encoding="utf-8")
 

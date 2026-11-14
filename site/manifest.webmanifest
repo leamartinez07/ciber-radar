@@ -14,15 +14,15 @@
   "theme_color": "#ffffff",
   "categories": ["news", "security"],
   "icons": [
-    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/icons/rr-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/rr-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/rr-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/rr-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Alertas", "url": "/alertas", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Vulnerabilidades", "url": "/vulnerabilidades", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Argentina", "url": "/argentina", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "English edition", "url": "/en", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Alertas", "url": "/alertas", "icons": [{ "src": "/icons/rr-192.png", "sizes": "192x192" }] },
+    { "name": "Vulnerabilidades", "url": "/vulnerabilidades", "icons": [{ "src": "/icons/rr-192.png", "sizes": "192x192" }] },
+    { "name": "Argentina", "url": "/argentina", "icons": [{ "src": "/icons/rr-192.png", "sizes": "192x192" }] },
+    { "name": "English edition", "url": "/en", "icons": [{ "src": "/icons/rr-192.png", "sizes": "192x192" }] }
   ]
 }

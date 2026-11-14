@@ -215,7 +215,7 @@ class RenderTests(unittest.TestCase):
         self.assertFalse(render.COUNTRY_PATTERNS["cu"].search("cubadebate"))
 
     def test_brand_assets_exist(self):
-        for name in ("favicon.ico", "og.png", "icons/icon.svg", "icons/apple-touch-icon.png", "icons/icon-maskable-512.png"):
+        for name in ("favicon.ico", "og.png", "icons/rr-icon.svg", "icons/rr-apple-touch-icon.png", "icons/rr-maskable-512.png"):
             self.assertTrue((self.out / name).is_file(), name)
         manifest = json.loads((self.out / "manifest.webmanifest").read_text(encoding="utf-8"))
         for icon in manifest["icons"]:
