@@ -681,7 +681,7 @@ class Site:
         sections = "".join(f'<li><a href="{lang.path(k)}">{esc(lang.name(k))}</a></li>' for k in NEWS_SECTIONS + ["vulns"])
         return (
             '<footer class="colophon"><div class="foot-grid">'
-            f'<div class="foot-brand"><a class="foot-logo" href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}">{CR_MARK}</a>'
+            f'<div class="foot-brand"><a class="foot-logo" href="{lang.path()}"><span class="sr">{SITE_NAME}, {esc(lang["home"])}</span>{CR_MARK}</a>'
             f'<p>{esc(lang["about"].format(owner=OWNER))}</p>'
             f'<p class="author"><span class="author-label">{esc(lang["author"])}:</span> '
             f'<a class="lockup" href="{OWNER_URL}" rel="noopener" translate="no">{BRAND_MARK}'
@@ -708,7 +708,11 @@ class Site:
         other = Lang("en" if lang.code == "es" else "es")
         is_home = key == "home"
         canonical = self.absolute(path)
-        brand = f'<a href="{lang.path()}" aria-label="{SITE_NAME}, {esc(lang["home"])}"><span class="side">Cibe</span><span class="rr" aria-hidden="true"><span class="r-flip">R</span><span>R</span></span><span class="side">adar</span></a>'
+        # El nombre va en texto oculto y el dibujo con aria-hidden: con aria-label, el texto visible
+        # partido ("Cibe", "RR", "adar") no coincidía con el nombre accesible (WCAG 2.5.3).
+        brand = (f'<a href="{lang.path()}"><span class="sr">{SITE_NAME}, {esc(lang["home"])}</span>'
+                 f'<span class="side" aria-hidden="true">Cibe</span><span class="rr" aria-hidden="true"><span class="r-flip">R</span><span>R</span></span>'
+                 f'<span class="side" aria-hidden="true">adar</span></a>')
         brand_tag = "h1" if is_home else "p"
         intro = f'<header class="page-head"><h1>{esc(heading)}</h1><p>{esc(description)}</p></header>' if heading else ""
         owner = {"@type": "Person", "name": OWNER, "url": OWNER_URL, "email": f"mailto:{OWNER_EMAIL}"}

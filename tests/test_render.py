@@ -215,6 +215,11 @@ class RenderTests(unittest.TestCase):
         self.assertIsNotNone(theme)
         self.assertLess(head.index(theme.group(0)), head.index('rel="stylesheet"'))
 
+    def test_logo_links_name_themselves_with_text_not_aria_label(self):
+        # WCAG 2.5.3: un aria-label que no contiene el texto visible confunde a quien dicta comandos.
+        self.assertNotIn('aria-label="Ciber Radar, Portada"', self.home)
+        self.assertEqual(self.home.count('<span class="sr">Ciber Radar, Portada</span>'), 2)
+
     def test_nav_marks_only_the_current_section(self):
         for name, label in (("index", "Portada"), ("argentina", "Argentina"), ("archivo", None), ("404", None)):
             page = (self.out / f"{name}.html").read_text(encoding="utf-8")
